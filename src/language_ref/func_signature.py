@@ -1,10 +1,10 @@
-class lang_funcSignature:
+class FuncSignature:
     """"
     funcSignature: identifier '(' list<argDef> ')' ('as' typeRef)? {
         argDef: identifier ('as' typeRef)?;
     };
     """
-class lang_argDef:
-    """"
-    argDef: identifier ('as' typeRef)?;
-    """
+    def lang_argDef(self):
+        """"
+        argDef: identifier ('as' typeRef)?;
+        """

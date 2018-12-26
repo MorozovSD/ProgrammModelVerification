@@ -1,4 +1,4 @@
-class lang_typeRef:
+class TypeRef:
     """"
     typeRef: {
         builtin: 'bool'|'byte'|'int'|'uint'|'long'|'ulong'|'char'|'string';
@@ -6,15 +6,15 @@ class lang_typeRef:
         |array: typeRef '(' (',')* ')';
     };
     """
-class lang_builtin:
-    """"
-    builtin: 'bool'|'byte'|'int'|'uint'|'long'|'ulong'|'char'|'string';
-    """
-class lang_custom:
-    """"
-    custom: identifier;
-    """
-class lang_array:
-    """"
-    array: typeRef '(' (',')* ')';
-    """
+    def lang_builtin(self):
+        """"
+        builtin: 'bool'|'byte'|'int'|'uint'|'long'|'ulong'|'char'|'string';
+        """
+    def lang_custom(self):
+        """"
+        custom: identifier;
+        """
+    def lang_array(self):
+        """"
+        array: typeRef '(' (',')* ')';
+        """

@@ -1,11 +1,18 @@
-from src import sintax_tree
+import sys
+import model_verivication
 
-input_file = None
-with open("test.txt") as file_handler:
-    print('Исходная программа')
-    for line in file_handler:
-        print(line)
-    input_file = [line.strip() for line in file_handler]
+BASE_TERM = []
 
-sintax_tree = sintax_tree.parse(input_file)
-sintax_tree.print()
+def main():
+    for arg in sys.argv[1:]:
+        print(arg)
+    with open('test_input.txt') as file_handler:
+        input_file = file_handler.read()
+    print(input_file)
+    sintax_tree = model_verivication.SintaxTreeParser()
+    sintax_tree.parse(input_file)
+    # sintax_tree.print()
+
+
+if __name__ == "__main__":
+    main()
