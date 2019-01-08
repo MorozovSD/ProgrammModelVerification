@@ -8,12 +8,12 @@ from ply_lex import tokens
 def p_source(p):
     """source :
     | sourceItem"""
-    p[0] = p[1]
+    p[0] = Node('source', [p[1]])
 
 def p_sourceItem(p):
     """sourceItem :
     | funcDef"""
-    p[0] = p[1]
+    p[0] = Node('sourceItem', [p[1]])
 
 def p_funcDef(p):
     """funcDef : FUNCTION funcSignature statements END FUNCTION"""
@@ -23,9 +23,9 @@ def p_funcSignature(p):
     """funcSignature : identifier LBRACES argDefs RBRACES AS typeRef
                      | identifier LBRACES argDefs RBRACES"""
     if len(p) == 7:
-        p[0] = Node('funcSignature', [p[1], p[2], p[6]])
+        p[0] = Node('funcSignature', [p[1], p[3], p[6]])
     else:
-        p[0] = Node('funcSignature', [p[1], p[2]])
+        p[0] = Node('funcSignature', [p[1], p[3]])
 
 def p_argDefs(p):
     """argDefs : argDefs COMMA
