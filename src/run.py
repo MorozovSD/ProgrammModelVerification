@@ -1,5 +1,7 @@
 import sys
-import model_verivication
+# from anytree import Node
+
+from yacc_parser import build_tree
 
 BASE_TERM = []
 
@@ -9,9 +11,9 @@ def main():
     with open('test_input.txt') as file_handler:
         input_file = file_handler.read()
     print(input_file)
-    sintax_tree = model_verivication.SintaxTreeParser()
-    sintax_tree.parse(input_file)
-    # sintax_tree.print()
+
+    result = build_tree(input_file)
+    print(result)
 
 
 if __name__ == "__main__":
