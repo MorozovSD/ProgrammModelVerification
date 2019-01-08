@@ -10,7 +10,6 @@ def main():
         print(arg)
     with open('test_input.txt') as file_handler:
         input_file = file_handler.read()
-    print(input_file)
 
     result = build_tree(input_file)
     print(result)

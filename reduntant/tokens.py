@@ -1,74 +1,59 @@
+# Типы переменных
+BUILTIN_BOOL = 'BUILTIN_BOOL'
+BUILTIN_BYTE = 'BUILTIN_BYTE'
+BUILTIN_INT = 'BUILTIN_INT'
+BUILTIN_UINT = 'BUILTIN_UINT'
+BUILTIN_LONG = 'BUILTIN_LONG'
+BUILTIN_ULONG = 'BUILTIN_ULONG'
+BUILTIN_CHAR = 'BUILTIN_CHAR'
+BUILTIN_STRING = 'BUILTIN_STRING'
+BUILTIN_LIST = 'BUILTIN_LIST'
+# Зарезервированные конструкции языка
+AS = 'AS'
+COMA = 'COMA'
+FUNCTION = 'FUNCTION'
+END = 'END'
+IF = 'IF'
+THEN = 'THEN'
+ELSE = 'ELSE'
+WHILE = 'WHILE'
+WEND = 'WEND'
+DO = 'DO'
+LOOP = 'LOOP'
+UNTIL = 'UNTIL'
+BREAK = 'BREAK'
+COLON = 'COLON'
+SEMICOLON = 'SEMICOLON'
+DIM = 'DIM'
+# Операции
+PLUS = 'PLUS'
+MINUS = 'MINUS'
+DIVIDE = 'DIVIDE'
+MUL = 'MUL'
+LESS_EQ = 'LESS_EQ'
+LESS = 'LESS'
+MORE_EQ = 'MORE_EQ'
+MORE = 'MORE'
+NOT_EQ = 'NOT_EQ'
+EQUAL = 'EQUAL'
+AND = 'AND'
+OR = 'OR'
 ASSIGNMENT = 'ASSIGNMENT'
-BINARY = 'BINARY'
-ID = 'ID'
-BRACES = 'BRACES'
-BUILTIN = 'BUILTIN'
-RESERVED = 'RESERVED'
-STR = 'STR'
-CHAR = 'CHAR'
+BRACES_OPEN = 'BRACES_OPEN'
+BRACES_CLOSE = 'BRACES_CLOSE'
+# Переменные
+BOOL = 'BOOL'
+BYTE = 'BYTE'
+DEC = 'DEC'
 HEX = 'HEX'
 BITS = 'BITS'
-DEC = 'DEC'
-BOOL = 'BOOL'
-
-tokens = [
-    # Комментарии и пробелы
-    (r'[ \n\t]+', None),
-    (r'#[^\n]*', None),
-    # Типы данных
-    (r'bool', BUILTIN),
-    (r'byte', BUILTIN),
-    (r'int', BUILTIN),
-    (r'uint', BUILTIN),
-    (r'long', BUILTIN),
-    (r'ulong', BUILTIN),
-    (r'char', BUILTIN),
-    (r'string', BUILTIN),
-    # Зарезервированные конструкции языка
-    (r'as', RESERVED),
-    (r',', RESERVED),
-    (r'function', RESERVED),
-    (r'end', RESERVED),
-    (r'if', RESERVED),
-    (r'then', RESERVED),
-    (r'else', RESERVED),
-    (r'while', RESERVED),
-    (r'wend', RESERVED),
-    (r'do', RESERVED),
-    (r'loop', RESERVED),
-    (r'until', RESERVED),
-    (r'break', RESERVED),
-    (r';', RESERVED),
-    (r'until', RESERVED),
-    # Бинарные операции
-    (r'\+', BINARY),
-    (r'\-', BINARY),
-    (r'/', BINARY),
-    (r'\*', BINARY),
-    (r'<=', BINARY),
-    (r'<', BINARY),
-    (r'>=', BINARY),
-    (r'>', BINARY),
-    (r'!=', BINARY),
-    (r'==', BINARY),
-    (r'and', BINARY),
-    (r'or', BINARY),
-    # Присваивание
-    (r'=', ASSIGNMENT),
-    # Скобки
-    (r'\(', BRACES),
-    (r'\)', BRACES),
-    # Литералы
-    (r'"[^\"\\]*(?:\\.[^\"\\]*)*\"', STR),
-    (r'\'[^\']\'', CHAR),
-    (r'0[xX][0-9A-Fa-f]+', HEX),
-    (r'0[bB][01]+', BITS),
-    (r'[0-9]+', DEC),
-    (r'(true)|(false)', BOOL),
-    # Идентификаторы
-    (r'[a-zA-Z_][a-zA-Z_0-9]*', ID),
-]
-
-
-def get():
-    return tokens
+INT = 'INT'
+UINT = 'UINT'
+LONG = 'LONG'
+ULONG = 'ULONG'
+CHAR = 'CHAR'
+STR = 'STR'
+# Имена переменных
+IDENTIFIER = 'IDENTIFIER'
+# Тип для непредвиденных токенов
+ILLEGAL_TYPE = 'ILLEGAL_TYPE'
