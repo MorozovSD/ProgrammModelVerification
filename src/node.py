@@ -1,12 +1,16 @@
+import re
+
+
 class Node:
     def parts_str(self):
         st = []
         for part in self.parts:
             st.append(str(part))
-        return "\n".join(st)
+        return '\n'.join(st)
 
     def __repr__(self):
-        return self.type + ":\n\t" + self.parts_str().replace("\n", "\n\t")
+        s = self.parts_str().replace('\n', '\n\t')
+        return str(self.type) + '\n\t' + re.sub(r'^', '', s)
 
     def add_parts(self, parts):
         self.parts += parts

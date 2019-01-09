@@ -1,5 +1,5 @@
 import sys
-# from anytree import Node
+from anytree import Node
 
 from yacc_parser import build_tree
 

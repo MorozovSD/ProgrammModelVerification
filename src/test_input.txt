@@ -1,4 +1,2 @@
-function test_func (test_arg_def as bool)
-dim test_bool as bool
-test_bool = true
+function test_func ()
 end function
