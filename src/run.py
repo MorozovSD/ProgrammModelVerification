@@ -1,6 +1,7 @@
 import sys
 from anytree import Node
 
+from node import render_tree, paint_tree
 from yacc_parser import build_tree
 
 BASE_TERM = []
@@ -12,7 +13,12 @@ def main():
         input_file = file_handler.read()
 
     result = build_tree(input_file)
+
     print(result)
+    root = result.build_tree(node=result)
+    tree = render_tree(root)
+    print(tree)
+    paint_tree(root, 'tree.png')
 
 
 if __name__ == "__main__":

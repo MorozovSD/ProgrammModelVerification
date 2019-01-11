@@ -1,2 +1,8 @@
-function test_func ()
+
+
+function test_func (rewqe as bool, rewq1e as string)
+end function
+    function test_func1 ()
+end function
+ function test_func11 ()
 end function
