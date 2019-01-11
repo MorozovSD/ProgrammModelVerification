@@ -2,18 +2,21 @@ from tempfile import NamedTemporaryFile
 
 from anytree import Node as TreeNode, RenderTree
 from anytree.exporter import DotExporter
-from subprocess import check_call
+from subprocess import check_call, CalledProcessError
 import os
 import re
 
 
 def paint_tree(root, filename):
-    with open('tree.dot', 'w') as dotfile:
+    with open('tree.dot', 'w', encoding='utf-8') as dotfile:
         for line in DotExporter(root):
             dotfile.write('%s\n' % line)
         dotfile.flush()
-        cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', filename]
-        check_call(cmd)
+        try:
+            cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', filename]
+            check_call(cmd)
+        except CalledProcessError:
+            print('Sorry tree.png wasn\'t created. Graphviz don\'t work with some character in node label')
 
 
 def paint_tree1(root, path):
@@ -45,9 +48,13 @@ class Node:
         self.leaf = leaf
 
     def build_tree(self, node=None, parent=None):
-        root = TreeNode(node.value, parent=parent if parent else None)
+        root = TreeNode(str(node.value), parent=parent if parent else None)
         if node.leaf is not None:
-            TreeNode(node.leaf, parent=root)
+            if type(node.leaf) == list:
+                for leaf in node.leaf:
+                    TreeNode(leaf, parent=root)
+            else:
+                TreeNode(node.leaf, parent=root)
         for child in node.children:
             if child is not None:
                 self.build_tree(node=child, parent=root)

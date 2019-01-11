@@ -10,8 +10,8 @@ def find_column(input, pos):
     return (pos - line_start) + 1
 
 
-def node_content(type, p, pos=1):
-    return type, p[pos], p.lineno(pos), find_column(p.lexer.lexdata, p.lexpos(pos))
+def node_content(type, p, pos=1, replace=''):
+    return type, p[pos].replace(replace, ''), p.lineno(pos), find_column(p.lexer.lexdata, p.lexpos(pos))
 
 
 def content(p, pos=1):
@@ -29,7 +29,7 @@ def leaf_pos(p):
 def p_source(p):
     """source :
     | sourceItem"""
-    p[0] = Node('source', [p[1]])
+    p[0] = Node(('source', 0, 0), [p[1]])
 
 
 def p_sourceItem(p):
@@ -38,7 +38,7 @@ def p_sourceItem(p):
     if len(p) == 1:
         p[0] = None
     else:
-        p[0] = Node('sourceItem', p[1])
+        p[0] = Node(('sourceItem', 0, 0), p[1])
 
 
 def p_funcDefs(p):
@@ -55,16 +55,16 @@ def p_funcDefs(p):
 
 def p_funcDef(p):
     """funcDef : FUNCTION funcSignature statements END FUNCTION"""
-    p[0] = Node('funcDef' + content(p), [p[2], p[3]])
+    p[0] = Node(('funcDef',  content(p)), [p[2], p[3]])
 
 
 def p_funcSignature(p):
     """funcSignature : identifier LBRACES argDefs RBRACES AS typeRef
                      | identifier LBRACES argDefs RBRACES"""
     if len(p) == 7:
-        p[0] = Node('funcSignature' + leaf_pos(p[1]), p[3, p[6]], leaf_content(p[1]))
+        p[0] = Node(('funcSignature', leaf_pos(p[1])), p[3, p[6]], leaf_content(p[1]))
     else:
-        p[0] = Node('funcSignature' + leaf_pos(p[1]), p[3], leaf_content(p[1]))
+        p[0] = Node(('funcSignature', leaf_pos(p[1])), p[3], leaf_content(p[1]))
 
 
 def p_argDefs(p):
@@ -93,9 +93,12 @@ def p_typeRef(p):
                | custom
                | array"""
     if type(p[1]) == Node:
-        p[0] = Node('typeRef' + content(p), [p[1]])
+        if 'array' in p[1].value:
+            p[0] = Node('typeRef' + content(p), [p[1]])
+        else:
+            p[0] = Node('typeRef' + content(p), [p[1]])
     else:
-        p[0] = Node('typeRef' + leaf_pos(p[1]), None, leaf_content(p[1]))
+        p[0] = Node('typeRef' + leaf_pos(p[1]), None, p[1])
 
 
 def p_builtin(p):
@@ -127,11 +130,13 @@ def p_commas(p):
 
 
 def p_identifiers(p):
-    """identifiers : identifiers COMMA identifier
+    """identifiers : identifier COMMA identifiers
                    | identifier"""
+    if len(p) == 1:
+        p[0] = None
     if len(p) == 4:
-        p[0] = p[1].add_children([p[2]])
-    else:
+        p[0] = [p[1], *p[3]] if type(p[3]) == list else [p[1], p[3]]
+    if len(p) == 2:
         p[0] = p[1]
 
 
@@ -145,17 +150,16 @@ def p_statements(p):
                   | statements statement
                   | statement
     """
-    if len(p) == 3:
-        p[0] = p[1].add_children([p[2]])
-    if len(p) == 2:
-        p[0] = p[1]
     if len(p) == 1:
         p[0] = None
+    if len(p) == 2:
+        p[0] = p[1]
+    if len(p) == 3:
+        p[0] = Node('statements', [p[1], *p[2]] if type(p[2]) == list else [p[1], p[2]])
 
 
 def p_statement(p):
     """statement : var
-                 | assignment
                  | if
                  | while
                  | do
@@ -166,7 +170,7 @@ def p_statement(p):
 
 def p_var(p):
     """var : DIM identifiers AS typeRef"""
-    p[0] = Node('new_variable' + content(p), [p[2], p[4]])
+    p[0] = Node('new_variable' + content(p), [p[4]], p[2])
 
 
 def p_if(p):
@@ -203,21 +207,27 @@ def p_exprs(p):
     """exprs : exprs COMMA
              | expr
     """
+    if len(p) == 1:
+        p[0] = None
+    if len(p) == 4:
+        p[0] = [p[1], *p[3]] if type(p[3]) == list else [p[1], p[3]]
     if len(p) == 2:
-        p[0] = Node('expr', [p[1]])
-    else:
         p[0] = p[1]
 
 
 def p_expr(p):
     """expr : binary
+            | assignment
             | unary
             | braces
             | callOrIndexer
             | place
             | literal
     """
-    p[0] = Node('expr', [p[1]])
+    if p.slice[1].type == 'place':
+        p[0] = Node('expr' + leaf_pos(p[1]), leaf=leaf_content(p[1]))
+    else:
+        p[0] = Node('expr', [p[1]])
 
 
 def p_binary(p):
@@ -233,20 +243,25 @@ def p_binary(p):
               | expr AND expr
               | expr OR expr
     """
-    p[0] = Node('Binary ' + p[3] + ':', [p[2], p[4]])
+    node = Node(p[2] + content(p, pos=2), [p[1], p[3]])
+    p[0] = Node('Binary ' + content(p, pos=2), [node])
 
 
 def p_unary(p):
     """unary : NOT expr
              | MINUS expr
     """
-    p[0] = Node('unary ', [p[2], p[1]])
+    node = Node(p[1] + content(p), [p[2]])
+    p[0] = Node('unary ', [node])
 
 
 def p_assignment(p):
     """assignment : identifiers ASSIGNMENT expr
     """
-    p[0] = Node('assign', [p[1], p[3]])
+    if type(p[1]) == list:
+        p[0] = Node('assign' + content(p, pos=2), [p[3]], [*p[1]])
+    else:
+        p[0] = Node('assign', [p[3]], [p[1]])
 
 
 def p_braces(p):
@@ -261,7 +276,7 @@ def p_callOrIndexer(p):
 
 def p_place(p):
     """place : identifier"""
-    p[0] = Node('variable', [p[1]])
+    p[0] = p[1]
 
 
 def p_literal(p):
@@ -276,12 +291,12 @@ def p_literal(p):
 
 def p_str(p):
     """str : STR"""
-    p[0] = Node('str', leaf=[node_content('str', p)])
+    p[0] = Node('str', leaf=[node_content('hex', p, replace='"')])
 
 
 def p_char(p):
     """char : CHAR"""
-    p[0] = Node('char', leaf=[node_content('char', p)])
+    p[0] = Node('char', leaf=[node_content('hex', p, replace='\'')])
 
 
 def p_hex(p):
