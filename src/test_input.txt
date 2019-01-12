@@ -1,8 +1,9 @@
-#function test_func11 ()
+function test_func11 ()
 #dim a as bool
-#a = a;
-#end function
-
+#a = a + a;
+a(true,false, false);
+end function
+#
 #function test_func111 ()
 #if a then
 #a = a;
@@ -10,21 +11,21 @@
 #dim a as bool
 #end if
 #end function
-
+#
 #function test_func1111 ()
 #while a
-#a = a
+#a = a;
 #wend
 #do
 #dim a as bool
 #loop while b
 #break
-#b = a + b
+#b = a + -b;
 #end function
 #
-function test_func1111 ()
-1234;
-"fasffas";
-'f';
-#afsa(v, s);
-end function
+#function test_func1111 ()
+#dim x as bool()
+#"fasffas";
+#'f';
+##afsa(v, s);
+#end function
