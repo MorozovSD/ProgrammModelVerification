@@ -14,14 +14,17 @@ def main():
 
     result = build_tree(input_file)
 
-    print(result)
+    # print(result)
     root = result.build_tree(node=result)
     tree = render_tree(root)
-    print(tree)
+    # print(tree)
     paint_tree(root, 'tree.png')
     with open('tree_text.txt', 'w', encoding='utf-8') as f:
         print(tree, file=f)
 
+    with open('tree_text_simple.txt', 'w', encoding='utf-8') as f:
+        for pre, _, node in tree:
+            print("%s%s" % (pre, node.name), file=f)
 
 if __name__ == "__main__":
     main()
