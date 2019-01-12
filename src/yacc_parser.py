@@ -386,5 +386,5 @@ def p_error(p):
 parser = yacc.yacc(debug=True)
 
 
-def build_tree(code):
+def parse_tokens(code):
     return parser.parse(code)

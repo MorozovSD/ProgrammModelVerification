@@ -1,10 +1,6 @@
-from tempfile import NamedTemporaryFile
-
 from anytree import Node as TreeNode, RenderTree
 from anytree.exporter import DotExporter
 from subprocess import check_call, CalledProcessError
-import os
-import re
 
 
 def paint_tree(root, filename):
@@ -43,18 +39,18 @@ class Node:
             self.children = []
         self.leaf = leaf
 
-    def build_tree(self, node=None, parent=None):
-        root = TreeNode(str(node.value), parent=parent if parent else None)
-        if node.leaf is not None:
-            if type(node.leaf) == list:
-                for leaf in node.leaf:
-                    TreeNode(leaf, parent=root)
-            else:
-                TreeNode(node.leaf, parent=root)
-        for child in node.children:
-            if child is not None:
-                self.build_tree(node=child, parent=root)
-                # if child.leaf is not None:
-                #     TreeNode(child.leaf, parent=root)
-        return root
 
+def build_tree(node=None, parent=None):
+    root = TreeNode(str(node.value), parent=parent if parent else None)
+    if node.leaf is not None:
+        if type(node.leaf) == list:
+            for leaf in node.leaf:
+                TreeNode(leaf, parent=root)
+        else:
+            TreeNode(node.leaf, parent=root)
+    for child in node.children:
+        if child is not None:
+            build_tree(node=child, parent=root)
+            # if child.leaf is not None:
+            #     TreeNode(child.leaf, parent=root)
+    return root

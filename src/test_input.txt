@@ -7,26 +7,26 @@
 #end function
 #
 ## statement test
-#function test_func111 ()
-#if a then
-#a = a;
-#a = a;
-#else
-#dim a as bool
-#dim a as bool
-#end if
-#while a
-#a = a;
-#a = a;
-#wend
-#do
-#dim a as bool
-#dim a as bool
-#loop while b
-#break
-#b = a + -b;
-#b = a + -b;
-#end function
+function test_func111 ()
+if a then
+a = a;
+a = a;
+else
+dim a as bool
+dim a as bool
+end if
+while a
+a = a;
+a = a;
+wend
+do
+dim a as bool
+dim a as bool
+loop while b
+break
+b = a + -b;
+b = a + -b;
+end function
 #
 #
 ## expr test
