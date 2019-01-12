@@ -1,4 +1,4 @@
-source(id: 1)
+test_input.txt(id: 1)
 └── sourceItem(id: 1)
     ├── funcDef(id: 1)
     │   ├── funcSignature(id: 1)

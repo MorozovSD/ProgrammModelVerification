@@ -7,10 +7,7 @@ from yacc_parser import parse_tokens
 def main():
     for arg in sys.argv[1:]:
         print(arg)
-    with open('test_input.txt') as file_handler:
-        input_file = file_handler.read()
-
-    root = build_tree(node=parse_tokens(input_file))
+    root = build_tree(node=parse_tokens('test_input.txt'))
 
     tree = render_tree(root)
     paint_tree(root, 'tree.png')

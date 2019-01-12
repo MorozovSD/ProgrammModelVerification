@@ -386,5 +386,9 @@ def p_error(p):
 parser = yacc.yacc(debug=True)
 
 
-def parse_tokens(code):
-    return parser.parse(code)
+def parse_tokens(path):
+    with open(path) as file_handler:
+        input_file = file_handler.read()
+        root = parser.parse(input_file)
+        root.value.name = path
+    return root
