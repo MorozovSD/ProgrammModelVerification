@@ -1,7 +1,7 @@
 import unittest
 
-from reduntant import lexer, tokens
-from reduntant.combinators import *
+from tmp import lexer, tokens
+from tmp.combinators import *
 
 id = Tag(tokens.ID)
 string = Tag(tokens.STR)

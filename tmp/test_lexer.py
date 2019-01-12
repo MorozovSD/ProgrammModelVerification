@@ -1,5 +1,5 @@
 import unittest
-from reduntant import lexer, tokens
+from tmp import lexer, tokens
 
 
 class TestLexer(unittest.TestCase):
