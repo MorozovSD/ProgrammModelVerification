@@ -10,8 +10,8 @@ def usage():
     python run.py -i ../input/test_input.txt,../input/test_input1.txt -o ../output/
     Arguments:
     -i (--input)  - input files
-    -o (--outpot) - outpit dir
-    -v            - detaled output
+    -o (--outpot) - output dir
+    -v            - detailed output
     --help        - help
     """)
 
