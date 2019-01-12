@@ -4,7 +4,7 @@ from subprocess import check_call, CalledProcessError
 
 
 def paint_tree(root, filename):
-    with open('tree.dot', 'w', encoding='utf-8') as dotfile:
+    with open(filename[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
         for line in DotExporter(root):
             dotfile.write('%s\n' % line)
         dotfile.flush()

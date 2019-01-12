@@ -1,0 +1,8 @@
+# simple
+function test_func111 ()
+if a then
+a = not a;
+else
+dim a as bool
+end if
+end function
