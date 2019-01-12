@@ -19,6 +19,8 @@ def main():
     tree = render_tree(root)
     print(tree)
     paint_tree(root, 'tree.png')
+    with open('tree_text.txt', 'w', encoding='utf-8') as f:
+        print(tree, file=f)
 
 
 if __name__ == "__main__":

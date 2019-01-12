@@ -19,10 +19,6 @@ def paint_tree(root, filename):
             print('Sorry tree.png wasn\'t created. Graphviz don\'t work with some character in node label')
 
 
-def paint_tree1(root, path):
-    DotExporter(root).to_dotfile(path)
-
-
 def render_tree(root):
     return RenderTree(root)
 
