@@ -39,7 +39,7 @@ class LeafContent:
         self.info = info
 
     def __repr__(self):
-        return str(self.type) + ': ' + str(self.name) + str((self.line, self.pos))
+        return str(self.name) + str((self.line, self.pos))
 
 
 def p_source(p):
@@ -81,7 +81,7 @@ def p_funcSignature(p):
     if p[3] is not None:
         expr_node += [*p[3]] if type(p[3]) == list else expr_node.append(p[3])
     if len(p) == 7:
-        p[0] = Node(NodeLabel('funcSignature'), expr_node + p[6], p[1])
+        p[0] = Node(NodeLabel('funcSignature'), expr_node + [p[6]], p[1])
     else:
         p[0] = Node(NodeLabel('funcSignature'), expr_node, p[1])
 
@@ -112,10 +112,7 @@ def p_typeRef(p):
                | custom
                | array"""
     if type(p[1]) == Node:
-        if p[1].value.name == 'array':
-            p[0] = Node(NodeLabel('typeRef', set_info(p)), [p[1]])
-        else:
-            p[0] = Node(NodeLabel('typeRef', set_info(p)), [p[1]])
+        p[0] = Node(NodeLabel('typeRef'), [p[1]])
     else:
         p[0] = Node(NodeLabel('typeRef'), None, p[1])
 
@@ -135,7 +132,7 @@ def p_builtin(p):
 
 def p_custom(p):
     """custom : identifier"""
-    p[0] = Node(NodeLabel('custom'), leaf=LeafContent(p[1]))
+    p[0] = Node(NodeLabel('custom'), leaf=p[1])
 
 
 def p_array(p):
@@ -168,7 +165,8 @@ def p_identifier(p):
 def p_statements(p):
     """statements : pre_statements
     """
-    p[0] = Node(NodeLabel('statements'), p[1])
+    p[0] = Node(NodeLabel('statements'), p[1]) if p[1] is not None else None
+
 
 
 def p_statement_nodes(p):
