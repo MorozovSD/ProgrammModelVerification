@@ -12,7 +12,8 @@ def paint_tree(root, filename):
             cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', filename]
             check_call(cmd)
         except CalledProcessError:
-            print('Sorry tree.png wasn\'t created. Graphviz don\'t work with some character in node label')
+            print('Sorry tree.png wasn\'t created. '
+                  'Probably reason: Graphviz don\'t work with some character in node label')
 
 
 def render_tree(root):

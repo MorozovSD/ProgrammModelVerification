@@ -1,4 +1,3 @@
-import argparse
 import getopt
 import sys
 
@@ -7,22 +6,23 @@ from yacc_parser import parse_tokens
 
 
 def usage():
-    print(""" Список агрументов:
-    -i (--input)  - список входных файлов 
-    -o (--outpot) - список выходных файлов 
-    -v            - Вывод в консоль результатов работы  
-    --help        - Подсказка
+    print("""Run example:
+    python run.py -i ../input/test_input.txt,../input/test_input1.txt -o ../output/
+    Arguments:
+    -i (--input)  - input files
+    -o (--outpot) - outpit dir
+    -v            - detaled output
+    --help        - help
     """)
 
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'i:o:v', ['help', 'output=', 'input='])
+        opts, args = getopt.getopt(sys.argv[1:], 'vi:o:v', ['help', 'output=', 'input='])
     except getopt.GetoptError:
-        # print help information and exit:
         usage()
         sys.exit(2)
-    output = None
+    output = ''
     input = None
     verbose = False
     for o, a in opts:
@@ -35,6 +35,11 @@ def main():
             output = a
         if o in ('-i', '--input'):
             input = a.split(',')
+    if input is None:
+        print('Input file doesn\'t set. Use -i to set input files')
+        usage()
+        sys.exit(2)
+
 
     roots = []
     trees = []
