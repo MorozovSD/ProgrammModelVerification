@@ -1,6 +1,6 @@
 import unittest
 
-from yacc_parser import build_tree
+from syntax_tree_parser import build_tree
 
 
 class TetsParser(unittest.TestCase):

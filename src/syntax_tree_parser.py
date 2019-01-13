@@ -4,17 +4,18 @@ from node import Node
 from ply_lex import tokens
 
 
-def find_column(data, pos):
-    line_start = data.rfind('\n', 0, pos) + 1
-    return (pos - line_start) + 1
-
-
-def set_info(p, pos=1):
-    return '(line: ' + str(p.lineno(pos)) + ' : pos: ' + str(find_column(p.lexer.lexdata, p.lexpos(pos))) + ')'
-
-
 class NodeLabel:
     count = {}
+
+    @staticmethod
+    def set_info(p, pos=1):
+        return '(line: ' + str(p.lineno(pos)) + \
+               ' : pos: ' + str(NodeLabel.find_column(p.lexer.lexdata, p.lexpos(pos))) + ')'
+
+    @staticmethod
+    def find_column(data, pos):
+        line_start = data.rfind('\n', 0, pos) + 1
+        return (pos - line_start) + 1
 
     def __init__(self, name, info=''):
         if name in self.count:
@@ -29,12 +30,13 @@ class NodeLabel:
         return str(self.name) + '(' + str('id: ' + str(self.count)) + ')'
 
 
-class LeafContent:
+class LeafContent(NodeLabel):
 
-    def __init__(self, p, type=None, index=1, info='', replace=''):
+    def __init__(self, p, name, type=None, index=1, info='', replace=''):
+        super().__init__(name, info)
         self.type = type
         self.name = p[index].replace(replace, '')
-        self.pos = find_column(p.lexer.lexdata, p.lexpos(index))
+        self.pos = NodeLabel.find_column(p.lexer.lexdata, p.lexpos(index))
         self.line = p.lineno(index)
         self.info = info
 
@@ -194,7 +196,7 @@ def p_statement(p):
 
 def p_var(p):
     """var : DIM identifiers AS typeRef"""
-    p[0] = Node(NodeLabel('new_variable', set_info(p)), [p[4]], p[2])
+    p[0] = Node(NodeLabel('new_variable', NodeLabel.set_info(p)), [p[4]], p[2])
 
 
 def p_if(p):
@@ -230,7 +232,7 @@ def p_do(p):
 
 def p_break(p):
     """break : BREAK"""
-    p[0] = Node(NodeLabel('break', set_info(p)), [])
+    p[0] = Node(NodeLabel('break', NodeLabel.set_info(p)), [])
 
 
 def p_expression(p):
@@ -282,7 +284,7 @@ def p_binary(p):
     expr_node.append(p[3]) if type(p[3]) == Node else expr_leaf.append(p[3])
 
     node = Node(NodeLabel(p[2]), expr_node, expr_leaf)
-    p[0] = Node(NodeLabel('Binary ', set_info(p, pos=2)), [node])
+    p[0] = Node(NodeLabel('Binary ', NodeLabel.set_info(p, pos=2)), [node])
 
 
 def p_unary(p):

@@ -1,8 +1,6 @@
 import getopt
 import sys
-
-from node import render_tree, paint_tree, build_tree
-from yacc_parser import parse_tokens
+from syntax_tree_parser import parse_tokens
 
 
 def usage():
@@ -40,21 +38,12 @@ def main():
         usage()
         sys.exit(2)
 
-
-    roots = []
-    trees = []
+    asts = []
     for file in input:
         file_name = file.split('/')[-1][:-4]
-        root = build_tree(node=parse_tokens(file))
-        tree = render_tree(root)
-        paint_tree(root, output + file_name + '.png')
-        with open(output + file_name + '.txt', 'w', encoding='utf-8') as f:
-            print(tree, file=f)
-        with open(output + 'simple_' + file_name + '.txt', 'w', encoding='utf-8') as f:
-            for pre, _, node in tree:
-                print("%s%s" % (pre, node.name), file=f)
-        roots += [root]
-        trees += [tree]
+        ast = parse_tokens(file)
+        ast.export(output_path=output, name=file_name, to_image=True, detailed=verbose)
+        asts += [ast]
 
 
 if __name__ == "__main__":
