@@ -1,3 +1,43 @@
+## funcSignature test
+#function test_func11() as bool(,,,,,)
+#end function
+#function test_func11() as stef
+#end function
+#function test_func11() as bool
+#end function
+#
+## statement test
+function test_func111 ()
+if a then
+a = a;
+a = a;
+else
+dim a as bool
+dim a as bool
+end if
+while a
+a = a;
+a = a;
+wend
+do
+dim a as bool
+dim a as bool
+loop while b
+break
+b = a + -b;
+b = a + -b;
+end function
+#
+#
+## expr test
+#function test_func1111 ()
+#b = a + (-b / a) + -b and not a + -b or a + -b;
+#"fasffas";
+#'f';
+#false;
+#afsa(false, "fq1");
+#end function
+
 # simple
 function test_func111 ()
 if a then

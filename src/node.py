@@ -7,13 +7,57 @@ class Node:
     def __repr__(self):
         return str(self.value)
 
-    def __init__(self, value, children=None, leaf=None):
+    def __init__(self, value, children=None):
         self.value = value
         if children:
             self.children = children
         else:
             self.children = []
-        self.leaf = leaf
+    
+    def is_leaf(self):
+        return not bool(self.children)
+        # self.leaf = leaf
+
+    # def find(self, pattern, node=None):
+    #     l = []
+    #     if node.children:
+    #         for child in node.children:
+    #             if child :
+    #                 if child.value.name == pattern:
+    #                     l += [child]
+    #                 if child.children :
+    #                     l += self.find(pattern=pattern, node=child)
+    #     return l
+    def print(self, node, tab='\t'):
+        print(tab + node.value.name)
+        if node.children:
+            for child in node.children:
+                if child:
+                    self.print(node=child, tab=tab+'\t')
+
+    def find(self, pattern, node=None):
+        match = []
+        if node.children:
+            for child in node.children:
+                if child:
+                    if child.value.name == pattern:
+                        match += [child]
+                    if child.children:
+                        match += self.find(pattern=pattern, node=child)
+        return match
+
+    def update_func_names(self, pattern, value, node=None):
+        match = []
+        if node.children:
+            for child in node.children:
+                if child:
+                    if child.value.name == pattern:
+                        founded = child
+                        founded.children[0].value.name = value + founded.children[0].value.name
+                        match += [founded]
+                    if child.children:
+                        match += self.update_func_names(pattern=pattern, node=child, value=value)
+        return match
 
     def export(self, output_path, name, to_image=True, detailed=False):
         node_for_print = Node.build_tree(node=self)
@@ -47,15 +91,12 @@ class Node:
     @staticmethod
     def build_tree(node=None, parent=None):
         root = TreeNode(str(node.value), parent=parent if parent else None)
-        if node.leaf is not None:
-            if type(node.leaf) == list:
-                for leaf in node.leaf:
-                    TreeNode(leaf, parent=root)
-            else:
-                TreeNode(node.leaf, parent=root)
         for child in node.children:
-            if child is not None:
-                Node.build_tree(node=child, parent=root)
+            if child:
+                if child.is_leaf():
+                    TreeNode(str(child.value), parent=root)
+                else:
+                    Node.build_tree(node=child, parent=root)
         return root
 
 
@@ -64,29 +105,38 @@ class NodeValue:
 
     @staticmethod
     def set_info(p, pos=1):
-        return '(line: ' + str(p.lineno(pos)) + \
-               ' : pos: ' + str(NodeValue.find_column(p.lexer.lexdata, p.lexpos(pos))) + ')'
+        return {'line': str(p.lineno(pos))}
+
+    @staticmethod
+    def set_name(p, pos=0):
+        return p.slice[pos].type
 
     @staticmethod
     def find_column(data, pos):
         line_start = data.rfind('\n', 0, pos) + 1
         return (pos - line_start) + 1
 
-    def __init__(self, name, info=''):
+    def __init__(self, name, info='', type=''):
         if name in self.count:
             NodeValue.count[name] += 1
         else:
             NodeValue.count[name] = 1
         self.count = NodeValue.count[name]
         self.name = name
+        self.type = type
         self.info = info
 
     def __repr__(self):
-        return str(self.name) + '(' + str('id: ' + str(self.count)) + ')'
+        type = str(self.type) + ' : ' if self.type else ''
+        return type + str(self.name) + '(' + str('id: ' + str(self.count)) + ')'
+
+    def set_type(self, type):
+        self.type = type
+        return self
 
 
 class LeafValue(NodeValue):
-    def __init__(self, p, name, type=None, index=1, info='', replace=''):
+    def __init__(self, p, name, type='', index=1, info='', replace=''):
         super().__init__(name, info)
         self.type = type
         self.name = p[index].replace(replace, '')
@@ -95,4 +145,5 @@ class LeafValue(NodeValue):
         self.info = info
 
     def __repr__(self):
-        return str(self.name) + str((self.line, self.pos))
+        type = str(self.type) + ' : ' if self.type else ''
+        return type + str(self.name) + str(('line: ' + str(self.line), 'pos: ' + str(self.pos)))

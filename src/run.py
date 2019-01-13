@@ -1,5 +1,8 @@
 import getopt
 import sys
+import os
+
+from graph_flow import Function
 from syntax_tree_parser import parse_tokens
 
 
@@ -39,11 +42,26 @@ def main():
         sys.exit(2)
 
     asts = []
+    funcs = []
     for file in input:
         file_name = file.split('/')[-1][:-4]
         ast = parse_tokens(file)
         ast.export(output_path=output, name=file_name, to_image=True, detailed=verbose)
         asts += [ast]
+        funcs_flow = {}
+        for ast in asts:
+            source = os.path.abspath(ast.value.name)
+            ast.update_func_names(pattern='funcSignature', value=source + ' :: ', node=ast)
+            funcs = Function.get_func(ast)
+            for i, func in enumerate(funcs):
+                if func in funcs_flow:
+                    print('Same func in one file. This is UNACCEPTABLE!... For now')
+                    sys.exit(2)
+                # funcs_flow[funcs.]
+                # func.export(output_path=output, name=file_name + '_func' + str(i), to_image=True, detailed=verbose)
+                # funcs += ast.find(pattern='funcDef', node=ast)
+
+
 
 
 if __name__ == "__main__":
