@@ -9,14 +9,13 @@ class Node:
 
     def __init__(self, value, children=None):
         self.value = value
-        if children:
-            self.children = children
-        else:
-            self.children = []
-    
+        self.children = children if children else []
+
     def is_leaf(self):
         return not bool(self.children)
-        # self.leaf = leaf
+
+    def add_child(self, child):
+        self.children += child
 
     # def find(self, pattern, node=None):
     #     l = []
@@ -33,7 +32,7 @@ class Node:
         if node.children:
             for child in node.children:
                 if child:
-                    self.print(node=child, tab=tab+'\t')
+                    self.print(node=child, tab=tab + '\t')
 
     def find(self, pattern, node=None):
         match = []
@@ -63,7 +62,7 @@ class Node:
         node_for_print = Node.build_tree(node=self)
         tree_for_print = self.render_tree(node_for_print)
         if to_image:
-            Node.to_png(node_for_print, output_path + name + '.png')
+            self.to_png(node_for_print, output_path + name + '.png')
         with open(output_path + name + '.txt', 'w', encoding='utf-8') as f:
             for pre, _, node in tree_for_print:
                 print("%s%s" % (pre, node.name), file=f)
@@ -71,10 +70,9 @@ class Node:
             with open(output_path + name + '_detailed' + '.txt', 'w', encoding='utf-8') as f:
                 print(tree_for_print, file=f)
 
-    @staticmethod
-    def to_png(tree, filename):
+    def to_png(self, tree, filename):
         with open(filename[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
-            for line in DotExporter(tree):
+            for line in self.dot_exporter(tree):
                 dotfile.write('%s\n' % line)
             dotfile.flush()
             try:
@@ -83,6 +81,9 @@ class Node:
             except CalledProcessError:
                 print('Sorry tree.png wasn\'t created. '
                       'Probably reason: Graphviz don\'t work with some character in node label')
+
+    def dot_exporter(self, tree):
+        return DotExporter(tree)
 
     @staticmethod
     def render_tree(root):

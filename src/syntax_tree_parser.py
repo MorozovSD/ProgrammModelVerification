@@ -214,7 +214,7 @@ def p_break(p):
 
 def p_expression(p):
     """expression : expr SEMICOLON"""
-    p[0] = p[1]
+    p[0] = Node(value=NodeValue(name=NodeValue.set_name(p), info=NodeValue.set_info(p)), children=[p[1]])
 
 
 def p_exprs(p):
@@ -298,7 +298,7 @@ def p_callOrIndexer(p):
     else:
         exprs_node.append(p[3])
     args = Node(value=NodeValue(name=NodeValue.set_name(p), info=NodeValue.set_info(p), type='In brace'),
-                children=[exprs_node])
+                children=exprs_node)
 
     p[0] = Node(value=NodeValue(name=NodeValue.set_name(p),
                                 info=NodeValue.set_info(p, pos=2)),

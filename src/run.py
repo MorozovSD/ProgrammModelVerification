@@ -51,17 +51,19 @@ def main():
         funcs_flow = {}
         for ast in asts:
             source = os.path.abspath(ast.value.name)
-            ast.update_func_names(pattern='funcSignature', value=source + ' :: ', node=ast)
+            # ast.update_func_names(pattern='funcSignature', value=source + ' :: ', node=ast)
             funcs = Function.get_func(ast)
+            output_flow = funcs[0].statements.build_graph(funcs[0].statements.statements, funcs[0].name)
+            # output_flow.print(output_flow)
+            # output_flow.export(output_path=output, name=file_name, to_image=True, detailed=verbose)
+
             for i, func in enumerate(funcs):
                 if func in funcs_flow:
-                    print('Same func in one file. This is UNACCEPTABLE!... For now')
+                    print('Same functions in one file. This is UNACCEPTABLE!... For now')
                     sys.exit(2)
-                # funcs_flow[funcs.]
-                # func.export(output_path=output, name=file_name + '_func' + str(i), to_image=True, detailed=verbose)
+                x = func.statements.build_graph(func.statements.statements, funcs[0].name)
+                x.to_png(x, output + '/' + file_name + '_func' + str(i))
                 # funcs += ast.find(pattern='funcDef', node=ast)
-
-
 
 
 if __name__ == "__main__":

@@ -27,16 +27,16 @@ break
 b = a + -b;
 b = a + -b;
 end function
-#
-#
-## expr test
-#function test_func1111 ()
-#b = a + (-b / a) + -b and not a + -b or a + -b;
-#"fasffas";
-#'f';
-#false;
-#afsa(false, "fq1");
-#end function
+
+
+# expr test
+function test_func1111 ()
+b = a + (-b / a) + -b and not a + -b or a + -b;
+"fasffas";
+'f';
+false;
+afsa(false, "fq1");
+end function
 
 # simple
 function test_func111 ()
