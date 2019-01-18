@@ -2,7 +2,7 @@ import getopt
 import sys
 import os
 
-from graph_flow import Function
+from graph_flow import Function, Graph
 from syntax_tree_parser import parse_tokens
 
 
@@ -62,7 +62,9 @@ def main():
                     print('Same functions in one file. This is UNACCEPTABLE!... For now')
                     sys.exit(2)
                 x = func.statements.build_graph(func.statements.statements, funcs[0].name)
-                x.to_png(x, output + '/' + file_name + '_func' + str(i))
+                for k, v in x.items():
+                    print(str(k) + '\t\t\t\t\t\t\t:::\t' + str(v))
+                Graph.graph_to_png(x, output + '/' + file_name + '_func' + str(i))
                 # funcs += ast.find(pattern='funcDef', node=ast)
 
 

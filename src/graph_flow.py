@@ -33,56 +33,55 @@ class Statement:
     def __init__(self, node):
         self.statements = self.get_statement(node)
 
-    def build_graph(self, stmt, name, parent=None):
+    def add_value(self, dict, key, value):
+        if dict.get(key):
+            dict.update({key: dict[key] + [value]})
+        else:
+            dict[key] = [value]
+
+
+    def build_graph(self, stmt, _parent=None, _graph=None):
         # def get_next(elem, l):
         #     return l[l.index(elem) + 1] if len(l) >= l.index(elem) + 1 else None
-        graph = {}
-        root = Graph(GraphValue(name))
-        parent = root
+        graph = _graph if _graph else {}
+        parent = _parent
         if stmt:
             for statement in stmt:
                 if statement:
                     value = statement.value
                     if value.name == 'var':
-                        # name, var, type_def, info='', type=''
                         name = value.name
-                        var = statement.children[0].children
+                        var = statement.children[0]
                         type_def = statement.children[1].children
-
                         child = Graph(GraphVar(name=name, var=var, type_def=type_def))
-                        graph[parent] += [child]
-                        # parent.add_child([child])
+                        self.add_value(graph, parent, child)
                         parent = child
                         continue
+
                     if value.name == 'if':
                         name = value.name
                         stmt_if   = statement.children[0].children
                         stmt_then = statement.children[1].children
                         stmt_else = statement.children[2].children if len(statement.children) == 3 else None
-                        if_legs = []
 
                         if_node = Graph(GraphIf(name=name, stmt_if=stmt_if, stmt_then=stmt_then, stmt_else=stmt_else))
-                        # parent.add_child([if_node])
-                        graph.update({parent : graph.get(if_node) + [if_node]})
-                        graph[parent] += [if_node]
+                        self.add_value(graph, parent, if_node)
+                        end_if = Graph(GraphValue(name='End if'))
 
-                        then_node = self.build_graph(name='then', stmt=stmt_then)
-                        # if_node.add_child([then_node])
-                        graph[if_node] += [then_node]
-                        graph.update(then_node)
-                        # then_last = then_node.find_leaf(if_node)[0] if then_node.find_leaf(if_node) else parent
-                        # parent = Graph(GraphValue(name='End if'))
-                        # then_last.add_child([parent])
-                        # graph[then_last] += [parent]
+                        if stmt_then:
+                            graph.update(self.build_graph(stmt=stmt_then, _graph=graph, _parent=if_node))
+                            then_last = stmt_then[-1].children[0]
+                            self.add_value(graph, then_last, end_if)
+                            parent = end_if
 
                         if stmt_else:
-                            else_node = self.build_graph(name='else', stmt=stmt_else)
-                            # if_node.add_child([else_node])
-                            # graph[if_node] += [else_node]
-                            # else_last = else_node.find_leaf(if_node)[1] if else_node.find_leaf(if_node) else if_node
-                            # else_last.add_child([parent])
-                            # graph[else_last] += [parent]
-                            graph.update(else_node)
+                            graph.update(self.build_graph(stmt=stmt_else, _graph=graph, _parent=if_node))
+                            else_last = stmt_else[-1].children[0]
+                            self.add_value(graph, else_last, end_if)
+                            parent = end_if
+
+                        if not stmt_then and not stmt_else:
+                            self.add_value(graph, if_node, end_if)
 
                         continue
 
@@ -90,18 +89,12 @@ class Statement:
                         name = value.name
                         stmt_while = statement.children[0].children
                         stmt_do = statement.children[1].children
+                        do_node = Graph(GraphWhile(name=name, stmt_while=stmt_while, stmt_do=stmt_do))
+                        graph[parent] = [do_node]
+                        graph = self.build_graph(stmt=stmt_do, _graph=graph, _parent=do_node)
+                        do_last = stmt_do[-1]
+                        graph.update({do_node: [graph.get(do_node)] + [do_last]})
 
-                        child = Graph(GraphWhile(name=name, stmt_while=stmt_while, stmt_do=stmt_do))
-                        # parent.add_child([child])
-                        graph[parent] += [child]
-                        parent = child
-                        child = self.build_graph(name='do', stmt=stmt_do)
-                        # parent.add_child([child])
-                        graph.update(child)
-                        graph[parent] += [child]
-                        # last_do = child.find_leaf(parent)[0] if child.find_leaf(parent) else parent
-                        # last_do.add_child([child])
-                        # graph[last_do] += [child]
                         continue
 
                     if value.name == 'do':
@@ -109,35 +102,25 @@ class Statement:
                         stmt_do = statement.children[0].children
                         stmt_while = statement.children[1].children
 
-                        child = Graph(GraphDo(name=name, stmt_do=stmt_do, stmt_while=stmt_while))
-                        # parent.add_child([child])
-                        graph[parent] += [child]
-                        parent = child
-                        child = self.build_graph(name='do', stmt=stmt_do)[0]
-                        graph.update(child)
-                        graph[parent] += [child]
-                        # parent.add_child([child])
-                        # graph[parent] += [child]
-                        # last_do = child.find_leaf(parent)[0] if child.find_leaf(parent) else parent
-                        # last_do.add_child([child])
-                        # graph[last_do] += [child]
+                        do_node = Graph(GraphDo(name=name, stmt_do=stmt_do, stmt_while=stmt_while))
+                        graph[parent] = [do_node]
+                        graph = self.build_graph(stmt=stmt_do, _graph=graph, _parent=do_node)
+                        do_last = stmt_do[-1]
+                        graph.update({do_node: [graph.get(do_node)] + [do_last]})
                         continue
 
                     if value.name == 'break':
                         name = value.name
                         child = Graph(GraphBreak(name=name))
-                        # parent.add_child([child])
-                        graph[parent] += [child]
+                        graph[parent] = [child]
                         parent = child
                         continue
 
                     if value.name == 'expression':
                         name = value.name
-                        expr = statement.children[0].children
-
+                        expr = statement
                         child = Graph(GraphExpression(name=name, expr=expr))
-                        # parent.add_child([child])
-                        graph[parent] += [child]
+                        graph[parent] = [child]
                         parent = child
                         continue
         return graph
@@ -147,13 +130,10 @@ class Graph(Node):
     def __repr__(self):
         return str(self.value)
 
-    def dot_exporter(self, node):
-        s = self.dot_type(node)
-        return 'digraph graphname {\n' + s + '}'
-
-    def to_png(self, tree, filename):
+    @staticmethod
+    def graph_to_png(graph, filename):
         with open(filename[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
-            dotfile.write(self.dot_exporter(tree))
+            dotfile.write(Graph.dot_type(graph))
             dotfile.flush()
             try:
                 cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', filename + '.png']
@@ -163,13 +143,15 @@ class Graph(Node):
                 print('Sorry tree.png wasn\'t created. '
                       'Probably reason: Graphviz don\'t work with some character in node label')
 
-    def dot_type(self, node):
+    @staticmethod
+    def dot_type(graph):
         s = ''
-        for child in node.children:
-            if child:
-                s += '"' + str(node) + '"' + ' -> ' + '"' + str(child) + '"' + ';\n'
-                s += self.dot_type(child)
-        return s
+        for key, value in graph.items():
+                s += '"' + str(key) + '"'
+                for v in value:
+                    s += ' -> ' + '"' + str(v) + '"'
+                s += ';\n'
+        return 'digraph graphname {\n' + s + '}'
 
     def __init__(self, value, children=None):
         super().__init__(value, children)

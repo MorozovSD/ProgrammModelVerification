@@ -149,7 +149,7 @@ def p_statement_nodes(p):
                       | statement
     """
     if len(p) == 1:
-        p[0] = None
+        p[0] = []
     if len(p) == 2:
         p[0] = p[1]
     if len(p) == 3:
