@@ -1,6 +1,5 @@
 from anytree import Node as TreeNode, RenderTree
 from anytree.exporter import DotExporter
-from subprocess import check_call, CalledProcessError
 
 
 class Node:
@@ -22,17 +21,6 @@ class Node:
             for child in node.children:
                 if child:
                     self.print(node=child, tab=tab + '\t')
-
-    # def find(self, pattern, node=None):
-    #     match = []
-    #     if node.children:
-    #         for child in node.children:
-    #             if child:
-    #                 if child.value.name == pattern:
-    #                     match += [child]
-    #                 if child.children:
-    #                     match += self.find(pattern=pattern, node=child)
-    #     return match
 
     def export(self, output_path, name, detailed=False):
         node_for_print = Node.build_tree(node=self)
@@ -64,10 +52,11 @@ class Node:
 
 
 class NodeValue(Node):
-    def __init__(self, role='', pos='', children=None):
+    def __init__(self, role='', pos=None, children=None):
         super().__init__(children=children)
         self.pos = pos
         self.role = role
 
     def __repr__(self):
-        return self.role
+        pos = ' : ' + self.pos if self.pos else ''
+        return self.role + pos

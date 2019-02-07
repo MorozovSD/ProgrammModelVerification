@@ -10,9 +10,7 @@ class FuncSignature(NodeValue):
         self.func_type = func_type
 
     def __repr__(self):
-        # args = self.args if self.args else ''
-        # return str(self.name) + '(' + str(args) + ') Line: ' + str(self.pos['line'])
-        return str('funcSignature')
+        return str('funcSignature') + ' : Line ' + str(self.pos['line'])
 
 
 class Function(NodeValue):
@@ -21,6 +19,7 @@ class Function(NodeValue):
         self.signature = signature
         self.type = type
         self.statements = statements
+        self.source_name = None
 
     def __repr__(self):
-        return str('funcDef')
+        return str('funcDef') + ' : Line ' + str(self.pos['line'])

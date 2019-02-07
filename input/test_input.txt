@@ -1,13 +1,13 @@
-## funcSignature test
-#function test_func11() as bool(,,,,,)
-#end function
-#function test_func11() as stef
-#end function
-#function test_func11() as bool
-#end function
-#
-## statement test
-function test_func111 ()
+# funcSignature test
+function test_func_funcSignature() as bool(,,,,,)
+end function
+function test_func11() as stef
+end function
+function test_func11() as bool
+end function
+
+# statement test
+function test_func_statement ()
 if a then
         a = a;
         a = a;
@@ -20,7 +20,6 @@ while a
     a = a;
     a = a;
 wend
-
 do
     dim a as bool
     dim a as bool
@@ -34,20 +33,21 @@ b = a + -b;
 end function
 
 
-## expr test
-#function test_func1111 ()
-#b = a + (-b / a) + -b and not a + -b or a + -b;
-#"fasffas";
-#'f';
+### expr test
+function test_func_expr()
+b = a + (-b / a) + -b and not a + -b or a + -b;
+b = afsa(false) + qqqq(false);
+"fasffas";
+'f';
 #false;
-#afsa(false, "fq1");
-#end function
-#
-## simple
-#function test_func111 ()#
-#if a then
-#a = not a;
-#else
-#dim a as bool
-#end if
-#end function
+afsa(false, "fq1");
+end function
+
+# simple
+function test_func_simple ()#
+if a then
+a = not a;
+else
+dim a as bool
+end if
+end function

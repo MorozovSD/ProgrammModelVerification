@@ -7,7 +7,7 @@ class Statements(NodeValue):
         self.statement_type = 'statements'
 
     def __repr__(self):
-        return self.statement_type
+        return self.statement_type  + ' : ' + str(self.pos) + ' : Line ' + str(self.pos['line'])
 
 
 class If(Statements):
@@ -31,7 +31,7 @@ class While(Statements):
 class Break(Statements):
     def __init__(self, pos=None):
         super().__init__(pos)
-        self.statement_type = 'break'
+        self.statement_type = 'break' + ' : Line ' + str(self.pos['line'])
 
 
 class Assignment(Statements):
@@ -41,8 +41,11 @@ class Assignment(Statements):
         self.identifier = identifier
         self.expr = expr
 
+    def __repr__(self):
+        return str(self.identifier) + ' = ' + str(self.expr) + ' : Line ' + str(self.pos['line'])
 
-class NewIdentifier(Statements):
+
+class Declaration(Statements):
     def __init__(self, identifiers, pos=None, type=None, children=None):
         super().__init__(pos=pos, children=children)
         self.statement_type = 'dim'
@@ -50,14 +53,5 @@ class NewIdentifier(Statements):
         self.type = type
 
     def __repr__(self):
-        return self.statement_type + ' ' + str(self.identifiers) + ' as type' + str(self.type)
+        return self.statement_type + ' ' + str(self.identifiers) + ' as type ' + str(self.type)  + ' : Line ' + str(self.pos['line'])
 
-
-class Expression(Statements):
-    def __init__(self, expr, pos='', children=None):
-        super().__init__(pos=pos, children=children)
-        self.statement_type = 'expression'
-        self.expr = expr
-
-    def __repr__(self):
-        return str(self.expr)

@@ -1,5 +1,14 @@
-from languade.statements import Expression
 from node import NodeValue
+
+
+class Expression(NodeValue):
+    def __init__(self, expr, pos='', children=None):
+        super().__init__(pos=pos, children=children)
+        self.statement_type = 'expression'
+        self.expr = expr
+
+    def __repr__(self):
+        return str(self.expr) + ' : Line ' + str(self.pos['line'])
 
 
 class Brace(Expression):
@@ -49,4 +58,4 @@ class CallOrIndexer(NodeValue):
         self.parameters = parameters
 
     def __repr__(self):
-        return self.expr + '(' + str(self.parameters) + ')'
+        return str(self.expr) + '(' + str(self.parameters) + ')'
