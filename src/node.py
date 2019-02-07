@@ -5,10 +5,9 @@ from subprocess import check_call, CalledProcessError
 
 class Node:
     def __repr__(self):
-        return str(self.value)
+        return 'Node class'
 
-    def __init__(self, value, children=None):
-        self.value = value
+    def __init__(self, children=None):
         self.children = children if children else []
 
     def is_leaf(self):
@@ -17,70 +16,33 @@ class Node:
     def add_child(self, child):
         self.children += child
 
-    # def find(self, pattern, node=None):
-    #     l = []
-    #     if node.children:
-    #         for child in node.children:
-    #             if child :
-    #                 if child.value.name == pattern:
-    #                     l += [child]
-    #                 if child.children :
-    #                     l += self.find(pattern=pattern, node=child)
-    #     return l
     def print(self, node, tab='\t'):
-        print(tab + node.value.name)
+        print(tab + str(node))
         if node.children:
             for child in node.children:
                 if child:
                     self.print(node=child, tab=tab + '\t')
 
-    def find(self, pattern, node=None):
-        match = []
-        if node.children:
-            for child in node.children:
-                if child:
-                    if child.value.name == pattern:
-                        match += [child]
-                    if child.children:
-                        match += self.find(pattern=pattern, node=child)
-        return match
+    # def find(self, pattern, node=None):
+    #     match = []
+    #     if node.children:
+    #         for child in node.children:
+    #             if child:
+    #                 if child.value.name == pattern:
+    #                     match += [child]
+    #                 if child.children:
+    #                     match += self.find(pattern=pattern, node=child)
+    #     return match
 
-    def update_func_names(self, pattern, value, node=None):
-        match = []
-        if node.children:
-            for child in node.children:
-                if child:
-                    if child.value.name == pattern:
-                        founded = child
-                        founded.children[0].value.name = value + founded.children[0].value.name
-                        match += [founded]
-                    if child.children:
-                        match += self.update_func_names(pattern=pattern, node=child, value=value)
-        return match
-
-    def export(self, output_path, name, to_image=True, detailed=False):
+    def export(self, output_path, name, detailed=False):
         node_for_print = Node.build_tree(node=self)
         tree_for_print = self.render_tree(node_for_print)
-        if to_image:
-            self.to_png(node_for_print, output_path + name + '.png')
         with open(output_path + name + '.txt', 'w', encoding='utf-8') as f:
             for pre, _, node in tree_for_print:
                 print("%s%s" % (pre, node.name), file=f)
         if detailed:
             with open(output_path + name + '_detailed' + '.txt', 'w', encoding='utf-8') as f:
                 print(tree_for_print, file=f)
-
-    def to_png(self, tree, filename):
-        with open(filename[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
-            for line in self.dot_exporter(tree):
-                dotfile.write('%s\n' % line)
-            dotfile.flush()
-            try:
-                cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', filename]
-                check_call(cmd)
-            except CalledProcessError:
-                print('Sorry tree.png wasn\'t created. '
-                      'Probably reason: Graphviz don\'t work with some character in node label')
 
     def dot_exporter(self, tree):
         return DotExporter(tree)
@@ -91,60 +53,21 @@ class Node:
 
     @staticmethod
     def build_tree(node=None, parent=None):
-        root = TreeNode(str(node.value), parent=parent if parent else None)
+        root = TreeNode(str(node), parent=parent if parent else None)
         for child in node.children:
             if child:
                 if child.is_leaf():
-                    TreeNode(str(child.value), parent=root)
+                    TreeNode(str(child), parent=root)
                 else:
                     Node.build_tree(node=child, parent=root)
         return root
 
 
-class NodeValue:
-    count = {}
-
-    @staticmethod
-    def set_info(p, pos=1):
-        return {'line': str(p.lineno(pos))}
-
-    @staticmethod
-    def set_name(p, pos=0):
-        return p.slice[pos].type
-
-    @staticmethod
-    def find_column(data, pos):
-        line_start = data.rfind('\n', 0, pos) + 1
-        return (pos - line_start) + 1
-
-    def __init__(self, name, info='', type=''):
-        if name in self.count:
-            NodeValue.count[name] += 1
-        else:
-            NodeValue.count[name] = 1
-        self.count = NodeValue.count[name]
-        self.name = name
-        self.type = type
-        self.info = info
+class NodeValue(Node):
+    def __init__(self, role='', pos='', children=None):
+        super().__init__(children=children)
+        self.pos = pos
+        self.role = role
 
     def __repr__(self):
-        type = str(self.type) + ' : ' if self.type else ''
-        return type + str(self.name) + '(' + str('id: ' + str(self.count)) + ')'
-
-    def set_type(self, type):
-        self.type = type
-        return self
-
-
-class LeafValue(NodeValue):
-    def __init__(self, p, name, type='', index=1, info='', replace=''):
-        super().__init__(name, info)
-        self.type = type
-        self.name = p[index].replace(replace, '')
-        self.pos = NodeValue.find_column(p.lexer.lexdata, p.lexpos(index))
-        self.line = p.lineno(index)
-        self.info = info
-
-    def __repr__(self):
-        type = str(self.type) + ' : ' if self.type else ''
-        return type + str(self.name) + str(('line: ' + str(self.line), 'pos: ' + str(self.pos)))
+        return self.role

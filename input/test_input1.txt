@@ -1,9 +1,28 @@
 # simple
-function test_func111 ()
+function test_func111(a as bool, b as bool)
+a, b, c, d = b + ((not a) + 123) and v;
+(5-6)*7;
+1*6+2;
+1+6*2;
+(1+6)*2;
+
 if a then
-a = not a;
-a = not a;
+a + not a;
 else
 dim a as bool
+end if
+end function
+
+function test_func111()
+#a, b, c, d = b + ((not a) + 123) and v;
+#(5-6)*7;
+#1*6+2;
+#1+6*2;
+#(1+6)*2;
+
+if a then
+a + not a;
+else
+dim a, b as bool
 end if
 end function

@@ -46,14 +46,13 @@ def main():
     for file in input:
         file_name = file.split('/')[-1][:-4]
         ast = parse_tokens(file)
-        ast.export(output_path=output, name=file_name, to_image=True, detailed=verbose)
+        print(ast.print(ast))
+        ast.export(output_path=output, name=file_name, detailed=verbose)
         asts += [ast]
         funcs_flow = {}
         for ast in asts:
-            source = os.path.abspath(ast.value.name)
-            # ast.update_func_names(pattern='funcSignature', value=source + ' :: ', node=ast)
-            funcs = Function.get_func(ast)
-            output_flow = funcs[0].statements.build_graph(funcs[0].statements.statements, funcs[0].name)
+            funcs = ast.children
+            # output_flow = funcs[0].statements.build_graph(funcs[0].statements.statements, funcs[0].name)
             # output_flow.print(output_flow)
             # output_flow.export(output_path=output, name=file_name, to_image=True, detailed=verbose)
 
@@ -61,10 +60,10 @@ def main():
                 if func in funcs_flow:
                     print('Same functions in one file. This is UNACCEPTABLE!... For now')
                     sys.exit(2)
-                x = func.statements.build_graph(func.statements.statements, funcs[0].name)
-                for k, v in x.items():
-                    print(str(k) + '\t\t\t\t\t\t\t:::\t' + str(v))
-                Graph.graph_to_png(x, output + '/' + file_name + '_func' + str(i))
+                # x = func.statements.build_graph(func.statements.statements, funcs[0].name)
+                # for k, v in x.items():
+                #     print(str(k) + '\t\t\t\t\t\t\t:::\t' + str(v))
+                # Graph.graph_to_png(x, output + '/' + file_name + '_func' + str(i))
                 # funcs += ast.find(pattern='funcDef', node=ast)
 
 
