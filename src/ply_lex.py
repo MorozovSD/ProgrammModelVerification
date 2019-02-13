@@ -47,6 +47,8 @@ tokens = (
     'ASSIGNMENT',
     'LBRACES',
     'RBRACES',
+    'SQR_LBRACES',
+    'SQR_RBRACES',
     # Переменные
     'BOOL',
     'BYTE',
@@ -113,6 +115,9 @@ t_ASSIGNMENT = r'='
 
 t_LBRACES = r'\('
 t_RBRACES = r'\)'
+
+t_SQR_LBRACES = r'\['
+t_SQR_RBRACES = r'\]'
 
 t_STR = r'"[^\"\\]*(?:\\.[^\"\\]*)*\"'
 t_CHAR = r'\'[^\']\''

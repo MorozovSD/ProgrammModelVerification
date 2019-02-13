@@ -5,10 +5,39 @@ from node import NodeValue
 
 
 class Graph:
+    @staticmethod
+    def to_png(graph, path, name):
+        with open(path + name[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
+            dotfile.write(Graph.dot_type(graph))
+            dotfile.flush()
+            try:
+                cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', path + name + '.png']
+                check_call(cmd)
+            except CalledProcessError:
+                print('Sorry tree.png wasn\'t created. '
+                      'Probably reason: Graphviz don\'t work with some character in node label')
+
+    @staticmethod
+    def dot_type(graph):
+        s = ''
+        for key, value in graph.items():
+            s += '"' + str(key) + '"[shape=box]\n'
+            for v in value:
+                s += '"' + str(v) + '"[shape=box]\n'
+                s += '"' + str(key) + '" -> "' + str(v) + '"[shape=box];\n'
+        return 'digraph graphname {\n' + s + '}'
+
+    @staticmethod
+    def print(graph):
+        pp = pprint.PrettyPrinter()
+        pp.pprint(graph)
+
+
+class GraphFlow(Graph):
     def __init__(self, func, path):
-        self.dict = {path: ''}
+        self.dict = {func: []}
         self.path = path
-        self.build_graph(func.statements, path)
+        self.build_graph(func.statements, func)
 
     def add_value(self, key, value):
         if self.dict.get(key):
@@ -31,11 +60,10 @@ class Graph:
                     continue
 
                 if type(statement) == If:
-                    if_start   = NodeValue(role='If')
-                    then_start = NodeValue(role='Then')
-                    else_start = NodeValue(role='Else')
-                    end_if     = NodeValue(role='End if')
-
+                    if_start   = NodeValue(role='If', pos=statement.pos)
+                    then_start = NodeValue(role='Then', pos=statement.pos)
+                    else_start = NodeValue(role='Else', pos=statement.pos)
+                    end_if     = NodeValue(role='End if', pos=statement.pos)
                     self.add_value(parent, if_start)
                     self.add_value(if_start, statement.expr)
 
@@ -43,6 +71,7 @@ class Graph:
                         self.add_value(statement.expr, then_start)
                         self.build_graph(statement.then_stmt, parent=then_start)
                         self.add_value(statement.then_stmt[-1], end_if)
+
                     if statement.then_stmt:
                         self.add_value(statement.expr, else_start)
                         self.build_graph(statement.else_stmt, parent=else_start)
@@ -55,8 +84,8 @@ class Graph:
 
                 if type(statement) == While:
                     if statement.loop_type:
-                        loop   = NodeValue(role='Do')
-                        end = NodeValue(role='End do')
+                        loop   = NodeValue(role='Do', pos=statement.pos)
+                        end = NodeValue(role='End do', pos=statement.pos)
                         expr = NodeValue(role=statement.loop_type)
 
                         self.add_value(parent, loop)
@@ -68,9 +97,9 @@ class Graph:
                         self.add_value(statement.expr, end)
                         parent = end
                     else:
-                        expr = NodeValue(role='While')
-                        end = NodeValue(role='End while')
-                        loop = NodeValue(role='Do')
+                        expr = NodeValue(role='While', pos=statement.pos)
+                        end = NodeValue(role='End while', pos=statement.pos)
+                        loop = NodeValue(role='Do', pos=statement.pos)
 
                         self.add_value(parent, expr)
                         self.add_value(expr, statement.expr)
@@ -81,9 +110,19 @@ class Graph:
                         parent = end
                     continue
 
+    def print(self):
+        pp = pprint.PrettyPrinter()
+        pp.pprint(self.dict)
+
+    def __repr__(self):
+        return str(self.dict)
+
+    # def to_png(self, path, name):
+    #     GraphFlow.to_png(self.dict, path, name)
+
     def to_png(self, path, name):
         with open(path + name[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
-            dotfile.write(self.dot_type())
+            dotfile.write(GraphFlow.dot_type(self.dict))
             dotfile.flush()
             try:
                 cmd = ['dot.exe', dotfile.name, '-T', 'png', '-o', path + name + '.png']
@@ -92,27 +131,12 @@ class Graph:
                 print('Sorry tree.png wasn\'t created. '
                       'Probably reason: Graphviz don\'t work with some character in node label')
 
-    def dot_type(self):
+    @staticmethod
+    def dot_type(graph):
         s = ''
-        for key, value in self.dict.items():
-            s += '"' + str(key) + '"[shape=box]\n'
+        for key, value in graph.items():
+            s += '"' + key.uniq_str() + '"[shape=box]\n'
             for v in value:
-                s += '"' + str(v) + '"[shape=box]\n'
-                s += '"' + str(key) + '" -> "' + str(v) + '"[shape=box];\n'
+                s += '"' + v.uniq_str() + '"[shape=box]\n'
+                s += '"' + key.uniq_str() + '" -> "' + v.uniq_str() + '"[shape=box];\n'
         return 'digraph graphname {\n' + s + '}'
-
-    def find_leaf(self, node):
-        leaf = []
-        for child in node.children:
-            if child.is_leaf():
-                leaf += [child]
-            else:
-                leaf += self.find_leaf(child)
-        return leaf
-
-    def print(self):
-        pp = pprint.PrettyPrinter()
-        pp.pprint(self.dict)
-
-    def __repr__(self):
-        return str(self.dict)

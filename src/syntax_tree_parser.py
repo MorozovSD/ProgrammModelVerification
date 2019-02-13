@@ -95,12 +95,12 @@ def p_builtin(p):
                | BUILTIN_CHAR
                | BUILTIN_STRING
                | BUILTIN_LIST"""
-    p[0] = NodeValue(role=p[1])
+    p[0] = NodeValue(role=p[1], pos=set_pos(p, 1))
 
 
 def p_custom(p):
     """custom : identifier"""
-    p[0] = NodeValue(role=p[1].value)
+    p[0] = NodeValue(role=p[1].value, pos=set_pos(p, 1))
 
 
 def p_array(p):
@@ -170,17 +170,17 @@ def p_if(p):
     _if = NodeValue(role='if', children=[p[2]])
     _then = NodeValue(role='then', children=[*p[4]])
     if len(p) == 7:
-        p[0] = If(expr=p[2], then_stmt=p[4], pos=set_pos(p, 2), children=[_if, _then])
+        p[0] = If(expr=p[2], then_stmt=p[4], pos=set_pos(p, 1), children=[_if, _then])
     else:
         _else = NodeValue(role='else', children=[*p[6]])
-        p[0] = If(expr=p[2], then_stmt=p[4], else_stmt=p[6], pos=set_pos(p, 2), children=[_if, _then, _else])
+        p[0] = If(expr=p[2], then_stmt=p[4], else_stmt=p[6], pos=set_pos(p, 1), children=[_if, _then, _else])
 
 
 def p_while(p):
     """while : WHILE expr statements WEND"""
     _while = NodeValue(role='while', children=[p[2]])
     _do = NodeValue(role='do', children=[*p[3]])
-    p[0] = While(expr=p[2], do_stmt=p[3], pos=set_pos(p, 2), children=[_while, _do])
+    p[0] = While(expr=p[2], do_stmt=p[3], pos=set_pos(p, 1), children=[_while, _do])
 
 
 def p_do(p):
@@ -188,7 +188,7 @@ def p_do(p):
           | DO statements LOOP UNTIL expr"""
     _loop = NodeValue(role=p[4], children=[p[5]])
     _do = NodeValue(role='do', children=[*p[2]])
-    p[0] = While(expr=p[5], do_stmt=p[2], loop_type=p[4], pos=set_pos(p, 2), children=[_do, _loop])
+    p[0] = While(expr=p[5], do_stmt=p[2], loop_type=p[4], pos=set_pos(p, 1), children=[_do, _loop])
 
 
 def p_break(p):
@@ -224,6 +224,7 @@ def p_expr(p):
             | unary
             | braces
             | callOrIndexer
+            | index
             | place
             | literal
     """
@@ -274,10 +275,18 @@ def p_callOrIndexer(p):
     """callOrIndexer : expr LBRACES exprs RBRACES"""
     parameters = []
     for i, parameter in enumerate(p[3]):
-        parameters.append(IndexOrParameter(exprs=parameter, index=i, pos=set_pos(p, 1), children=p[3]))
+        parameters.append(Parameter(exprs=parameter, index=i, pos=set_pos(p, 2), children=p[3]))
     callOrIndexer = NodeValue('callOrIndexer', children=parameters)
     expr = NodeValue('expr', children=[p[1]])
-    p[0] = CallOrIndexer(expr=p[1], parameters=parameters, pos=set_pos(p, 1), children=[expr, callOrIndexer])
+    p[0] = CallOrIndexer(expr=p[1], parameters=parameters, pos=set_pos(p, 2), children=[expr, callOrIndexer])
+
+
+def p_index(p):
+    """index :  identifier SQR_LBRACES expr SQR_RBRACES
+    """
+    name = NodeValue('ListName', children=[p[1]])
+    index = NodeValue('Index', children=[p[3]])
+    p[0] = Index(name=p[1], index=p[3], pos=set_pos(p, 1), children=[name, index])
 
 
 def p_place(p):
@@ -339,5 +348,5 @@ def parse_tokens(path):
     with open(path) as file_handler:
         input_file = file_handler.read()
         root = parser.parse(input_file)
-        root.source_name = path
+        root.set_source_name(path)
     return root

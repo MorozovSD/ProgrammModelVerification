@@ -56,7 +56,28 @@ class NodeValue(Node):
         super().__init__(children=children)
         self.pos = pos
         self.role = role
+        self.context = Context()
+        self.id = 'L' + str(pos['line']) + 'P' + str(pos['pos']) if pos else ''
 
     def __repr__(self):
-        pos = ' : ' + self.pos if self.pos else ''
+        pos = ' : ' + str(self.pos['line']) if self.pos else ''
         return self.role + pos
+
+    def get(self, _type):
+        list = []
+        if type(self) == _type:
+            list += [self]
+        if self.children:
+            for child in self.children:
+                list += child.get(_type)
+        return list
+
+    def uniq_str(self):
+        return str(self) + ' (id: ' + self.id + ')'
+
+
+class Context:
+    def __init__(self, source='', variables=None, functions=None):
+        self.source = source
+        self.functions = functions or []
+        self.variables = variables or []

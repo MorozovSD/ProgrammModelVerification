@@ -7,7 +7,10 @@ class Statements(NodeValue):
         self.statement_type = 'statements'
 
     def __repr__(self):
-        return self.statement_type  + ' : ' + str(self.pos) + ' : Line ' + str(self.pos['line'])
+        return self.statement_type + ' : Line ' + str(self.pos['line'])
+
+    def uniq_str(self):
+        return str(self.statement_type) + ' (id: ' + self.id + ')'
 
 
 class If(Statements):
@@ -31,7 +34,7 @@ class While(Statements):
 class Break(Statements):
     def __init__(self, pos=None):
         super().__init__(pos)
-        self.statement_type = 'break' + ' : Line ' + str(self.pos['line'])
+        self.statement_type = 'break'
 
 
 class Assignment(Statements):
@@ -44,6 +47,9 @@ class Assignment(Statements):
     def __repr__(self):
         return str(self.identifier) + ' = ' + str(self.expr) + ' : Line ' + str(self.pos['line'])
 
+    def uniq_str(self):
+        return str(self.identifier) + ' = ' + str(self.expr) + ' (id: ' + self.id + ')'
+
 
 class Declaration(Statements):
     def __init__(self, identifiers, pos=None, type=None, children=None):
@@ -53,5 +59,8 @@ class Declaration(Statements):
         self.type = type
 
     def __repr__(self):
-        return self.statement_type + ' ' + str(self.identifiers) + ' as type ' + str(self.type)  + ' : Line ' + str(self.pos['line'])
+        return self.statement_type + ' ' + str(self.identifiers) + ' as type ' + str(self.type) + ' : Line ' + str(
+            self.pos['line'])
 
+    def uniq_str(self):
+        return self.statement_type + ' ' + str(self.identifiers) + ' as type ' + str(self.type) + ' (id: ' + self.id + ')'

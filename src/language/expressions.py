@@ -10,6 +10,9 @@ class Expression(NodeValue):
     def __repr__(self):
         return str(self.expr) + ' : Line ' + str(self.pos['line'])
 
+    def uniq_str(self):
+        return str(self.expr) + ' (id: ' + self.id + ')'
+
 
 class Brace(Expression):
     def __init__(self, expr, brace=False, pos='', children=None):
@@ -41,7 +44,7 @@ class UnaryExpression(NodeValue):
         return self.operand + ' ' + str(self.expr)
 
 
-class IndexOrParameter(NodeValue):
+class Parameter(NodeValue):
     def __init__(self, exprs, index, pos=None, children=None):
         super().__init__(pos=pos, children=children)
         self.exprs = exprs
@@ -56,6 +59,18 @@ class CallOrIndexer(NodeValue):
         super().__init__(pos=pos, children=children)
         self.expr = expr
         self.parameters = parameters
+        from language import Identifier
+        self.call_func = None if type(self.expr) == Identifier else 'CurrentlyUnknown'
 
     def __repr__(self):
         return str(self.expr) + '(' + str(self.parameters) + ')'
+
+
+class Index(NodeValue):
+    def __init__(self, name, index, pos=None, children=None):
+        super().__init__(pos=pos, children=children)
+        self.name = name
+        self.index = index
+
+    def __repr__(self):
+        return str(self.name) + '(' + str(self.index) + ')'
