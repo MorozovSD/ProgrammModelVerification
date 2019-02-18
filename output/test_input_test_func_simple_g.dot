@@ -1,0 +1,25 @@
+digraph graphname {
+"../input/test_input.txt/test_func_simple (id: L55P1)"[shape=box]
+"If : 56 (id: L56P1)"[shape=box]
+"../input/test_input.txt/test_func_simple (id: L55P1)" -> "If : 56 (id: L56P1)"[shape=box];
+"If : 56 (id: L56P1)"[shape=box]
+"a (id: L56P4)"[shape=box]
+"If : 56 (id: L56P1)" -> "a (id: L56P4)"[shape=box];
+"a (id: L56P4)"[shape=box]
+"Then : 56 (id: L56P1)"[shape=box]
+"a (id: L56P4)" -> "Then : 56 (id: L56P1)"[shape=box];
+"Else : 56 (id: L56P1)"[shape=box]
+"a (id: L56P4)" -> "Else : 56 (id: L56P1)"[shape=box];
+"Then : 56 (id: L56P1)"[shape=box]
+"a = not a (id: L57P3)"[shape=box]
+"Then : 56 (id: L56P1)" -> "a = not a (id: L57P3)"[shape=box];
+"a = not a (id: L57P3)"[shape=box]
+"End if : 56 (id: L56P1)"[shape=box]
+"a = not a (id: L57P3)" -> "End if : 56 (id: L56P1)"[shape=box];
+"Else : 56 (id: L56P1)"[shape=box]
+"dim a as type bool : 59 (id: L59P1)"[shape=box]
+"Else : 56 (id: L56P1)" -> "dim a as type bool : 59 (id: L59P1)"[shape=box];
+"dim a as type bool : 59 (id: L59P1)"[shape=box]
+"End if : 56 (id: L56P1)"[shape=box]
+"dim a as type bool : 59 (id: L59P1)" -> "End if : 56 (id: L56P1)"[shape=box];
+}

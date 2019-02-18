@@ -1,0 +1,151 @@
+../input/test_input1.txt
+├── ../input/test_input1.txt/test3 : Line 102
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test3
+│   │   └── argDefs
+│   └── statements
+│       ├── (a + b)([false, fq1]) : Line 103
+│       │   └── expression
+│       │       └── (a + b)([false, fq1])
+│       │           ├── expr
+│       │           │   └── (a + b)
+│       │           │       └── braces
+│       │           │           └── a + b
+│       │           │               └── +
+│       │           │                   ├── a
+│       │           │                   └── b
+│       │           └── callOrIndexer
+│       │               ├── false
+│       │               │   ├── false
+│       │               │   │   └── literal
+│       │               │   │       ├── type
+│       │               │   │       │   └── false
+│       │               │   │       └── value
+│       │               │   │           └── bool
+│       │               │   └── fq1
+│       │               │       └── literal
+│       │               │           ├── type
+│       │               │           │   └── fq1
+│       │               │           └── value
+│       │               │               └── str
+│       │               └── fq1
+│       │                   ├── false
+│       │                   │   └── literal
+│       │                   │       ├── type
+│       │                   │       │   └── false
+│       │                   │       └── value
+│       │                   │           └── bool
+│       │                   └── fq1
+│       │                       └── literal
+│       │                           ├── type
+│       │                           │   └── fq1
+│       │                           └── value
+│       │                               └── str
+│       ├── (a + b)([false, fq1]) : Line 104
+│       │   └── expression
+│       │       └── (a + b)([false, fq1])
+│       │           ├── expr
+│       │           │   └── (a + b)
+│       │           │       └── braces
+│       │           │           └── a + b
+│       │           │               └── +
+│       │           │                   ├── a
+│       │           │                   └── b
+│       │           └── callOrIndexer
+│       │               ├── false
+│       │               │   ├── false
+│       │               │   │   └── literal
+│       │               │   │       ├── type
+│       │               │   │       │   └── false
+│       │               │   │       └── value
+│       │               │   │           └── bool
+│       │               │   └── fq1
+│       │               │       └── literal
+│       │               │           ├── type
+│       │               │           │   └── fq1
+│       │               │           └── value
+│       │               │               └── str
+│       │               └── fq1
+│       │                   ├── false
+│       │                   │   └── literal
+│       │                   │       ├── type
+│       │                   │       │   └── false
+│       │                   │       └── value
+│       │                   │           └── bool
+│       │                   └── fq1
+│       │                       └── literal
+│       │                           ├── type
+│       │                           │   └── fq1
+│       │                           └── value
+│       │                               └── str
+│       └── test1([false, fq1]) : Line 105
+│           └── expression
+│               └── test1([false, fq1])
+│                   ├── expr
+│                   │   └── test1
+│                   └── callOrIndexer
+│                       ├── false
+│                       │   ├── false
+│                       │   │   └── literal
+│                       │   │       ├── type
+│                       │   │       │   └── false
+│                       │   │       └── value
+│                       │   │           └── bool
+│                       │   └── fq1
+│                       │       └── literal
+│                       │           ├── type
+│                       │           │   └── fq1
+│                       │           └── value
+│                       │               └── str
+│                       └── fq1
+│                           ├── false
+│                           │   └── literal
+│                           │       ├── type
+│                           │       │   └── false
+│                           │       └── value
+│                           │           └── bool
+│                           └── fq1
+│                               └── literal
+│                                   ├── type
+│                                   │   └── fq1
+│                                   └── value
+│                                       └── str
+└── ../input/test_input1.txt/test4 : Line 108
+    ├── funcSignature : Line 0
+    │   ├── identifier
+    │   │   └── test4
+    │   └── argDefs
+    └── statements
+        └── test1([false, fq1]) : Line 109
+            └── expression
+                └── test1([false, fq1])
+                    ├── expr
+                    │   └── test1
+                    └── callOrIndexer
+                        ├── false
+                        │   ├── false
+                        │   │   └── literal
+                        │   │       ├── type
+                        │   │       │   └── false
+                        │   │       └── value
+                        │   │           └── bool
+                        │   └── fq1
+                        │       └── literal
+                        │           ├── type
+                        │           │   └── fq1
+                        │           └── value
+                        │               └── str
+                        └── fq1
+                            ├── false
+                            │   └── literal
+                            │       ├── type
+                            │       │   └── false
+                            │       └── value
+                            │           └── bool
+                            └── fq1
+                                └── literal
+                                    ├── type
+                                    │   └── fq1
+                                    └── value
+                                        └── str

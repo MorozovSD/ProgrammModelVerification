@@ -1,0 +1,5 @@
+digraph graphname {
+"test1 (id: l100p1)"[shape=box]
+"test2([false, fq1]) (id: l101p20)"[shape=box]
+"test1 (id: l100p1)" -> "test2([false, fq1]) (id: l101p20)"[shape=box];
+}

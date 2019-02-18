@@ -1,68 +1,68 @@
-## funcSignature test
-#function test_func_funcSignature() as bool(,,,,,)
-#end function
-#function test_func11() as stef
-#end function
-#function test_func11() as bool
-#end function
-#
-## statement test
-#function test_func_statement ()
-#if a then
-#        a = a;
-#        a = a;
-#    else
-#        dim a as bool
-#        dim a as bool
-#end if
-#
-#if a then
-#        a = a;
-#        a = a;
-#    else
-#        dim a as bool
-#        dim a as bool
-#end if
-#
-#while a
-#    a = a;
-#    a = a;
-#wend
-#do
-#    dim a as bool
-#    dim a as bool
-#loop while b
-#
-#break
-#
-#b = a + -b(1);
-#b = a + -b;
-#
-#end function
-#
-#
-#### expr test
-#function test_func_expr()
-#b = a + (-b / a) + -b and not a + -b or a + -b;
-#b = test_func_statement(false) + test_func1111(false) + qqqq[false + 1];
-#"fasffas";
-#'f';
-##false;
-#afsa(false, "fq1");
-#end function
-#
-## simple
-#function test_func_simple ()#
-#if a then
-#a = not a;
-#else
-#dim a as bool
-#end if
-#end function
+# funcSignature test
+function test_func_funcSignature() as bool(,,,,,)
+end function
+function test_func11() as stef
+end function
+function test_func11() as bool
+end function
+
+# statement test
+function test_func_statement ()
+if a then
+        a = a;
+        a = a;
+    else
+        dim a as bool
+        dim a as bool
+end if
+
+if a then
+        a = a;
+        a = a;
+    else
+        dim a as bool
+        dim a as bool
+end if
+
+while a
+    a = a;
+    a = a;
+wend
+do
+    dim a as bool
+    dim a as bool
+loop while b
+
+break
+
+b = a + -b(1);
+b = a + -b;
+
+end function
+
+
+### expr test
+function test_func_expr()
+b = a + (-b / a) + -b and not a + -b or a + -b;
+b = test_func_statement(false) + test_func1111(false) + qqqq[false + 1];
+"fasffas";
+'f';
+#false;
+afsa(false, "fq1");
+end function
+
+# simple
+function test_func_simple ()#
+if a then
+a = not a;
+else
+dim a as bool
+end if
+end function
 
 
 function test1()
-test1(false, "fq1");
+("dasd" + 324 + False)(false, "fq1");
 test1(false, "fq1");
 test2(false, "fq1");
 end function

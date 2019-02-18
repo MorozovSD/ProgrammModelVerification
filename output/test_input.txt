@@ -1,0 +1,476 @@
+../input/test_input.txt
+├── ../input/test_input.txt/test_func_funcSignature : Line 2
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test_func_funcSignature
+│   │   ├── argDefs
+│   │   └── typeRef
+│   └── statements
+├── ../input/test_input.txt/test_func11 : Line 4
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test_func11
+│   │   ├── argDefs
+│   │   └── typeRef
+│   └── statements
+├── ../input/test_input.txt/test_func11 : Line 6
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test_func11
+│   │   ├── argDefs
+│   │   └── typeRef
+│   └── statements
+├── ../input/test_input.txt/test_func_statement : Line 10
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test_func_statement
+│   │   └── argDefs
+│   └── statements
+│       ├── if : Line 11
+│       │   ├── if
+│       │   │   └── a
+│       │   ├── then
+│       │   │   ├── a = a : Line 12
+│       │   │   │   └── assignment
+│       │   │   │       ├── identifiers
+│       │   │   │       │   └── a
+│       │   │   │       └── value
+│       │   │   │           └── a
+│       │   │   └── a = a : Line 13
+│       │   │       └── assignment
+│       │   │           ├── identifiers
+│       │   │           │   └── a
+│       │   │           └── value
+│       │   │               └── a
+│       │   └── else
+│       │       ├── dim a as type bool : 15 : Line 15
+│       │       │   └── dim
+│       │       │       ├── names
+│       │       │       │   └── a
+│       │       │       └── type
+│       │       │           └── bool
+│       │       └── dim a as type bool : 16 : Line 16
+│       │           └── dim
+│       │               ├── names
+│       │               │   └── a
+│       │               └── type
+│       │                   └── bool
+│       ├── if : Line 19
+│       │   ├── if
+│       │   │   └── a
+│       │   ├── then
+│       │   │   ├── a = a : Line 20
+│       │   │   │   └── assignment
+│       │   │   │       ├── identifiers
+│       │   │   │       │   └── a
+│       │   │   │       └── value
+│       │   │   │           └── a
+│       │   │   └── a = a : Line 21
+│       │   │       └── assignment
+│       │   │           ├── identifiers
+│       │   │           │   └── a
+│       │   │           └── value
+│       │   │               └── a
+│       │   └── else
+│       │       ├── dim a as type bool : 23 : Line 23
+│       │       │   └── dim
+│       │       │       ├── names
+│       │       │       │   └── a
+│       │       │       └── type
+│       │       │           └── bool
+│       │       └── dim a as type bool : 24 : Line 24
+│       │           └── dim
+│       │               ├── names
+│       │               │   └── a
+│       │               └── type
+│       │                   └── bool
+│       ├── while : Line 27
+│       │   ├── while
+│       │   │   └── a
+│       │   └── do
+│       │       ├── a = a : Line 28
+│       │       │   └── assignment
+│       │       │       ├── identifiers
+│       │       │       │   └── a
+│       │       │       └── value
+│       │       │           └── a
+│       │       └── a = a : Line 29
+│       │           └── assignment
+│       │               ├── identifiers
+│       │               │   └── a
+│       │               └── value
+│       │                   └── a
+│       ├── while : Line 31
+│       │   ├── do
+│       │   │   ├── dim a as type bool : 32 : Line 32
+│       │   │   │   └── dim
+│       │   │   │       ├── names
+│       │   │   │       │   └── a
+│       │   │   │       └── type
+│       │   │   │           └── bool
+│       │   │   └── dim a as type bool : 33 : Line 33
+│       │   │       └── dim
+│       │   │           ├── names
+│       │   │           │   └── a
+│       │   │           └── type
+│       │   │               └── bool
+│       │   └── while
+│       │       └── b
+│       ├── break : Line 36
+│       ├── b = a + - b([1]) : Line 38
+│       │   └── assignment
+│       │       ├── identifiers
+│       │       │   └── b
+│       │       └── value
+│       │           └── a + - b([1])
+│       │               └── +
+│       │                   ├── a
+│       │                   └── - b([1])
+│       │                       └── -
+│       │                           └── b([1])
+│       │                               ├── expr
+│       │                               │   └── b
+│       │                               └── callOrIndexer
+│       │                                   └── 1
+│       │                                       └── 1
+│       │                                           └── literal
+│       │                                               ├── type
+│       │                                               │   └── 1
+│       │                                               └── value
+│       │                                                   └── dec
+│       └── b = a + - b : Line 39
+│           └── assignment
+│               ├── identifiers
+│               │   └── b
+│               └── value
+│                   └── a + - b
+│                       └── +
+│                           ├── a
+│                           └── - b
+│                               └── -
+│                                   └── b
+├── ../input/test_input.txt/test_func_expr : Line 45
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test_func_expr
+│   │   └── argDefs
+│   └── statements
+│       ├── b = a + (- b / a) + - b and not a + - b or a + - b : Line 46
+│       │   └── assignment
+│       │       ├── identifiers
+│       │       │   └── b
+│       │       └── value
+│       │           └── a + (- b / a) + - b and not a + - b or a + - b
+│       │               └── +
+│       │                   ├── a
+│       │                   └── (- b / a) + - b and not a + - b or a + - b
+│       │                       └── +
+│       │                           ├── (- b / a)
+│       │                           │   └── braces
+│       │                           │       └── - b / a
+│       │                           │           └── -
+│       │                           │               └── b / a
+│       │                           │                   └── /
+│       │                           │                       ├── b
+│       │                           │                       └── a
+│       │                           └── - b and not a + - b or a + - b
+│       │                               └── -
+│       │                                   └── b and not a + - b or a + - b
+│       │                                       └── and
+│       │                                           ├── b
+│       │                                           └── not a + - b or a + - b
+│       │                                               └── not
+│       │                                                   └── a + - b or a + - b
+│       │                                                       └── +
+│       │                                                           ├── a
+│       │                                                           └── - b or a + - b
+│       │                                                               └── -
+│       │                                                                   └── b or a + - b
+│       │                                                                       └── or
+│       │                                                                           ├── b
+│       │                                                                           └── a + - b
+│       │                                                                               └── +
+│       │                                                                                   ├── a
+│       │                                                                                   └── - b
+│       │                                                                                       └── -
+│       │                                                                                           └── b
+│       ├── b = test_func_statement([false]) + test_func1111([false]) + qqqq(false + 1) : Line 47
+│       │   └── assignment
+│       │       ├── identifiers
+│       │       │   └── b
+│       │       └── value
+│       │           └── test_func_statement([false]) + test_func1111([false]) + qqqq(false + 1)
+│       │               └── +
+│       │                   ├── test_func_statement([false])
+│       │                   │   ├── expr
+│       │                   │   │   └── test_func_statement
+│       │                   │   └── callOrIndexer
+│       │                   │       └── false
+│       │                   │           └── false
+│       │                   │               └── literal
+│       │                   │                   ├── type
+│       │                   │                   │   └── false
+│       │                   │                   └── value
+│       │                   │                       └── bool
+│       │                   └── test_func1111([false]) + qqqq(false + 1)
+│       │                       └── +
+│       │                           ├── test_func1111([false])
+│       │                           │   ├── expr
+│       │                           │   │   └── test_func1111
+│       │                           │   └── callOrIndexer
+│       │                           │       └── false
+│       │                           │           └── false
+│       │                           │               └── literal
+│       │                           │                   ├── type
+│       │                           │                   │   └── false
+│       │                           │                   └── value
+│       │                           │                       └── bool
+│       │                           └── qqqq(false + 1)
+│       │                               ├── ListName
+│       │                               │   └── qqqq
+│       │                               └── Index
+│       │                                   └── false + 1
+│       │                                       └── +
+│       │                                           ├── false
+│       │                                           │   └── literal
+│       │                                           │       ├── type
+│       │                                           │       │   └── false
+│       │                                           │       └── value
+│       │                                           │           └── bool
+│       │                                           └── 1
+│       │                                               └── literal
+│       │                                                   ├── type
+│       │                                                   │   └── 1
+│       │                                                   └── value
+│       │                                                       └── dec
+│       ├── fasffas : Line 48
+│       │   └── expression
+│       │       └── fasffas
+│       │           └── literal
+│       │               ├── type
+│       │               │   └── fasffas
+│       │               └── value
+│       │                   └── str
+│       ├── f : Line 49
+│       │   └── expression
+│       │       └── f
+│       │           └── literal
+│       │               ├── type
+│       │               │   └── f
+│       │               └── value
+│       │                   └── char
+│       └── afsa([false, fq1]) : Line 51
+│           └── expression
+│               └── afsa([false, fq1])
+│                   ├── expr
+│                   │   └── afsa
+│                   └── callOrIndexer
+│                       ├── false
+│                       │   ├── false
+│                       │   │   └── literal
+│                       │   │       ├── type
+│                       │   │       │   └── false
+│                       │   │       └── value
+│                       │   │           └── bool
+│                       │   └── fq1
+│                       │       └── literal
+│                       │           ├── type
+│                       │           │   └── fq1
+│                       │           └── value
+│                       │               └── str
+│                       └── fq1
+│                           ├── false
+│                           │   └── literal
+│                           │       ├── type
+│                           │       │   └── false
+│                           │       └── value
+│                           │           └── bool
+│                           └── fq1
+│                               └── literal
+│                                   ├── type
+│                                   │   └── fq1
+│                                   └── value
+│                                       └── str
+├── ../input/test_input.txt/test_func_simple : Line 55
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test_func_simple
+│   │   └── argDefs
+│   └── statements
+│       └── if : Line 56
+│           ├── if
+│           │   └── a
+│           ├── then
+│           │   └── a = not a : Line 57
+│           │       └── assignment
+│           │           ├── identifiers
+│           │           │   └── a
+│           │           └── value
+│           │               └── not a
+│           │                   └── not
+│           │                       └── a
+│           └── else
+│               └── dim a as type bool : 59 : Line 59
+│                   └── dim
+│                       ├── names
+│                       │   └── a
+│                       └── type
+│                           └── bool
+├── ../input/test_input.txt/test1 : Line 64
+│   ├── funcSignature : Line 0
+│   │   ├── identifier
+│   │   │   └── test1
+│   │   └── argDefs
+│   └── statements
+│       ├── (dasd + 324 + False)([false, fq1]) : Line 65
+│       │   └── expression
+│       │       └── (dasd + 324 + False)([false, fq1])
+│       │           ├── expr
+│       │           │   └── (dasd + 324 + False)
+│       │           │       └── braces
+│       │           │           └── dasd + 324 + False
+│       │           │               └── +
+│       │           │                   ├── dasd
+│       │           │                   │   └── literal
+│       │           │                   │       ├── type
+│       │           │                   │       │   └── dasd
+│       │           │                   │       └── value
+│       │           │                   │           └── str
+│       │           │                   └── 324 + False
+│       │           │                       └── +
+│       │           │                           ├── 324
+│       │           │                           │   └── literal
+│       │           │                           │       ├── type
+│       │           │                           │       │   └── 324
+│       │           │                           │       └── value
+│       │           │                           │           └── dec
+│       │           │                           └── False
+│       │           └── callOrIndexer
+│       │               ├── false
+│       │               │   ├── false
+│       │               │   │   └── literal
+│       │               │   │       ├── type
+│       │               │   │       │   └── false
+│       │               │   │       └── value
+│       │               │   │           └── bool
+│       │               │   └── fq1
+│       │               │       └── literal
+│       │               │           ├── type
+│       │               │           │   └── fq1
+│       │               │           └── value
+│       │               │               └── str
+│       │               └── fq1
+│       │                   ├── false
+│       │                   │   └── literal
+│       │                   │       ├── type
+│       │                   │       │   └── false
+│       │                   │       └── value
+│       │                   │           └── bool
+│       │                   └── fq1
+│       │                       └── literal
+│       │                           ├── type
+│       │                           │   └── fq1
+│       │                           └── value
+│       │                               └── str
+│       ├── test1([false, fq1]) : Line 66
+│       │   └── expression
+│       │       └── test1([false, fq1])
+│       │           ├── expr
+│       │           │   └── test1
+│       │           └── callOrIndexer
+│       │               ├── false
+│       │               │   ├── false
+│       │               │   │   └── literal
+│       │               │   │       ├── type
+│       │               │   │       │   └── false
+│       │               │   │       └── value
+│       │               │   │           └── bool
+│       │               │   └── fq1
+│       │               │       └── literal
+│       │               │           ├── type
+│       │               │           │   └── fq1
+│       │               │           └── value
+│       │               │               └── str
+│       │               └── fq1
+│       │                   ├── false
+│       │                   │   └── literal
+│       │                   │       ├── type
+│       │                   │       │   └── false
+│       │                   │       └── value
+│       │                   │           └── bool
+│       │                   └── fq1
+│       │                       └── literal
+│       │                           ├── type
+│       │                           │   └── fq1
+│       │                           └── value
+│       │                               └── str
+│       └── test2([false, fq1]) : Line 67
+│           └── expression
+│               └── test2([false, fq1])
+│                   ├── expr
+│                   │   └── test2
+│                   └── callOrIndexer
+│                       ├── false
+│                       │   ├── false
+│                       │   │   └── literal
+│                       │   │       ├── type
+│                       │   │       │   └── false
+│                       │   │       └── value
+│                       │   │           └── bool
+│                       │   └── fq1
+│                       │       └── literal
+│                       │           ├── type
+│                       │           │   └── fq1
+│                       │           └── value
+│                       │               └── str
+│                       └── fq1
+│                           ├── false
+│                           │   └── literal
+│                           │       ├── type
+│                           │       │   └── false
+│                           │       └── value
+│                           │           └── bool
+│                           └── fq1
+│                               └── literal
+│                                   ├── type
+│                                   │   └── fq1
+│                                   └── value
+│                                       └── str
+└── ../input/test_input.txt/test2 : Line 70
+    ├── funcSignature : Line 0
+    │   ├── identifier
+    │   │   └── test2
+    │   └── argDefs
+    └── statements
+        └── test1([false, fq1]) : Line 71
+            └── expression
+                └── test1([false, fq1])
+                    ├── expr
+                    │   └── test1
+                    └── callOrIndexer
+                        ├── false
+                        │   ├── false
+                        │   │   └── literal
+                        │   │       ├── type
+                        │   │       │   └── false
+                        │   │       └── value
+                        │   │           └── bool
+                        │   └── fq1
+                        │       └── literal
+                        │           ├── type
+                        │           │   └── fq1
+                        │           └── value
+                        │               └── str
+                        └── fq1
+                            ├── false
+                            │   └── literal
+                            │       ├── type
+                            │       │   └── false
+                            │       └── value
+                            │           └── bool
+                            └── fq1
+                                └── literal
+                                    ├── type
+                                    │   └── fq1
+                                    └── value
+                                        └── str
