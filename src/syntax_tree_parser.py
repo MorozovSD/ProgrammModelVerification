@@ -4,6 +4,10 @@ from node import NodeValue
 import ply.yacc as yacc
 from ply_lex import tokens
 
+precedence = (('nonassoc', 'LESS_EQ', 'LESS', 'MORE_EQ', 'MORE', 'NOT_EQ', 'EQUAL'),
+              ('left', 'PLUS', 'MINUS', 'OR'),
+              ('left', 'DIVIDE', 'MUL', 'AND'),
+              ('right', 'NOT', 'UMINUS'))
 
 def set_pos(p, index):
     line_start = p.lexer.lexdata.rfind('\n', 0, p.lexpos(index)) + 1
@@ -19,7 +23,10 @@ def add_to_list(l, obj):
 def p_source(p):
     """source :
     | sourceItem"""
-    p[0] = Source(children=[*p[1]])
+    try:
+        p[0] = Source(children=[*p[1]])
+    except IndexError:
+        p[0] = Source()
 
 
 def p_sourceItem(p):
@@ -105,7 +112,7 @@ def p_custom(p):
 
 def p_array(p):
     """array : typeRef LBRACES commas RBRACES"""
-    p[0] = Array(type=p[1], len=p[2])
+    p[0] = Array(type=p[1], len=p[3])
 
 
 def p_commas(p):
@@ -121,7 +128,8 @@ def p_identifiers(p):
     """identifiers : identifier COMMA identifiers
                    | identifier"""
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = []
+        p[0] = add_to_list(p[0], p[1])
     if len(p) == 4:
         p[0] = []
         p[0] = add_to_list(p[0], p[1])
@@ -159,7 +167,7 @@ def p_statement(p):
 def p_var(p):
     """var : DIM identifiers AS typeRef"""
     names = NodeValue(role='names', children=[NodeValue(role=str(p[2]))])
-    type = NodeValue(role='type', children=[NodeValue(role=p[4].role)])
+    type = NodeValue(role='type', children=[p[4]])
     dim = NodeValue(role='dim', children=[names, type])
     p[0] = Declaration(identifiers=p[2], type=p[4], pos=set_pos(p, 1), children=[dim])
 
@@ -210,7 +218,8 @@ def p_exprs(p):
     if len(p) == 1:
         p[0] = None
     if len(p) == 2:
-        p[0] = [p[1]]
+        p[0] = []
+        p[0] = add_to_list(p[0], p[1])
     if len(p) == 4:
         p[0] = []
         p[0] = add_to_list(p[0], p[1])
@@ -250,7 +259,7 @@ def p_binary(p):
 
 def p_unary(p):
     """unary : NOT expr
-             | MINUS expr
+             | MINUS expr %prec UMINUS
     """
     unary = NodeValue(role=p[1], children=[p[2]])
     p[0] = UnaryExpression(expr=p[2], operand=p[1], children=[unary])

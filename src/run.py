@@ -46,6 +46,8 @@ def main():
     calls = {}
     functions = []
     func_usage = {'CurrentlyUnknown': []}
+    byte_code = []
+    byte_code_func = {}
     for file in input:
         file_name = file.split('/')[-1][:-4]
         ast = parse_tokens(file)
@@ -60,8 +62,9 @@ def main():
             func_path = ast.source_name.split('/')[-1][:-4] + '_' + func.signature.name
             graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
             graphs.append(graph_flow)
-            graph_flow.print()
             graph_flow.to_png(path=output, name=func_path + '_graph')
+            byte_code_func[ast.source_name + '/' + func.signature.name] = len(byte_code)
+            byte_code += func.byte_code()
         calls.update(ast.get_calls())
 
     for calls_path, _calls in calls.items():
@@ -97,6 +100,23 @@ def main():
     Graph.print(func_usage)
     Graph.print(inverse_mapping(func_usage))
     Graph.to_png(inverse_mapping(func_usage), output, 'Functions Calls')
+
+    print('linear_code')
+    with open(output + 'linear_code.txt', 'w', encoding='utf-8') as f:
+        for i, line in enumerate(byte_code):
+            print(str(i) + '\t' + str(line), file=f)
+            print(str(i) + '\t' + str(line))
+
+    print('linear_code_func_start')
+    with open(output + 'linear_code_func_start.txt', 'w', encoding='utf-8') as f:
+        for func, place in byte_code_func.items():
+            print(str(place) + '\t' + str(func), file=f)
+            print(str(place) + '\t' + str(func))
+
+
+
+
+
 
 
 def inverse_mapping(f):

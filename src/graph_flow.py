@@ -37,6 +37,7 @@ class GraphFlow(Graph):
     def __init__(self, func, path):
         self.dict = {func: []}
         self.path = path
+        self.stack = []
         self.build_graph(func.statements, func)
 
     def add_value(self, key, value):
@@ -69,15 +70,15 @@ class GraphFlow(Graph):
 
                     if statement.then_stmt:
                         self.add_value(statement.expr, then_start)
-                        self.build_graph(statement.then_stmt, parent=then_start)
-                        self.add_value(statement.then_stmt[-1], end_if)
+                        then_end = self.build_graph(statement.then_stmt, parent=then_start)
+                        self.add_value(then_end, end_if)
 
-                    if statement.then_stmt:
+                    if statement.else_stmt:
                         self.add_value(statement.expr, else_start)
-                        self.build_graph(statement.else_stmt, parent=else_start)
-                        self.add_value(statement.else_stmt[-1], end_if)
+                        else_end = self.build_graph(statement.else_stmt, parent=else_start)
+                        self.add_value(else_end, end_if)
 
-                    if not statement.then_stmt and not statement.then_stmt:
+                    if not statement.then_stmt and not statement.else_stmt:
                         self.add_value(if_start, end_if)
                     parent = end_if
                     continue
@@ -86,14 +87,14 @@ class GraphFlow(Graph):
                     if statement.loop_type:
                         loop   = NodeValue(role='Do', pos=statement.pos)
                         end = NodeValue(role='End do', pos=statement.pos)
-                        expr = NodeValue(role=statement.loop_type)
+                        expr = NodeValue(role=statement.loop_type, pos=statement.pos)
 
                         self.add_value(parent, loop)
-                        self.build_graph(statement.do_stmt, parent=loop)
-                        self.add_value(statement.do_stmt[-1], expr)
+                        loop_end = self.build_graph(statement.do_stmt, parent=loop)
+                        self.add_value(loop_end, expr)
                         self.add_value(expr, statement.expr)
 
-                        self.add_value(statement.expr, statement.do_stmt[0])
+                        self.add_value(statement.expr, loop)
                         self.add_value(statement.expr, end)
                         parent = end
                     else:
@@ -104,11 +105,12 @@ class GraphFlow(Graph):
                         self.add_value(parent, expr)
                         self.add_value(expr, statement.expr)
                         self.add_value(statement.expr, loop)
-                        self.build_graph(statement.do_stmt, parent=loop)
-                        self.add_value(statement.do_stmt[-1], end)
-                        self.add_value(statement.do_stmt[-1], statement.expr)
+                        loop_end = self.build_graph(statement.do_stmt, parent=loop)
+                        self.add_value(loop_end, end)
+                        self.add_value(loop_end, statement.expr)
                         parent = end
                     continue
+        return parent
 
     def print(self):
         pp = pprint.PrettyPrinter()

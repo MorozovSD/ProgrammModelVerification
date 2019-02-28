@@ -20,14 +20,9 @@ class Source(NodeValue):
 
     def get_calls(self):
         calls = {}
-        # if self.children:
-        #     for child in self.children:
-        #         found = child.get(CallOrIndexer)
-        #         if found:
-        #             l += [(self.signature.name, f) for f in found] if type(found) == list else [found]
-        # return l
-        for item in self.source_items:
-            calls[item] = item.get(CallOrIndexer)
+        if self.source_items:
+            for item in self.source_items:
+                calls[item] = item.get(CallOrIndexer)
         return calls
 
     def get_functions(self):

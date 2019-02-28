@@ -65,6 +65,10 @@ tokens = (
     'IDENTIFIER',
     'ILLEGAL_TYPE'
 )
+
+
+
+
 reserved = {
     'bool': 'BUILTIN_BOOL',
     'byte': 'BUILTIN_BYTE',
@@ -121,6 +125,7 @@ t_SQR_RBRACES = r'\]'
 
 t_STR = r'"[^\"\\]*(?:\\.[^\"\\]*)*\"'
 t_CHAR = r'\'[^\']\''
+
 
 
 @TOKEN(dec)

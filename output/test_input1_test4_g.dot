@@ -1,5 +1,0 @@
-digraph graphname {
-"../input/test_input1.txt/test4 (id: L108P1)"[shape=box]
-"test1([false, fq1]) (id: L109P20)"[shape=box]
-"../input/test_input1.txt/test4 (id: L108P1)" -> "test1([false, fq1]) (id: L109P20)"[shape=box];
-}

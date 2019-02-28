@@ -10,6 +10,9 @@ class Literal(NodeValue):
     def __repr__(self):
         return str(self.value)
 
+    def byte_code(self):
+        return [self.type.upper(), self.value]
+
 
 class Identifier(NodeValue):
     def __init__(self, name, value=None, pos='', type=None, children=None):
@@ -24,6 +27,9 @@ class Identifier(NodeValue):
 
     def __repr__(self):
         return str(self.name)
+
+    def byte_code(self):
+        return ['VAR ' + self.name]
 
 
 class Argument(NodeValue):
@@ -46,3 +52,6 @@ class Array(NodeValue):
 
     def __repr__(self):
         return 'array of ' + str(self.type)
+
+    def byte_code(self):
+        return ['ARRAY', str(self.len), *self.type.byte_code(),  'EARRAY']

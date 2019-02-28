@@ -75,6 +75,9 @@ class NodeValue(Node):
     def uniq_str(self):
         return str(self) + ' (id: ' + self.id + ')'
 
+    def byte_code(self):
+        return [self.role]
+
 
 class Context:
     def __init__(self, source='', variables=None, functions=None):
