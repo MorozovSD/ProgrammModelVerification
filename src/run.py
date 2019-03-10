@@ -3,6 +3,7 @@ import sys
 
 from Exeptions import *
 from graph_flow import Graph, GraphFlow
+from interpreter import Interpreter
 from syntax_tree_parser import parse_tokens
 
 
@@ -138,6 +139,8 @@ def main():
         for func, place in byte_code_func.items():
             print(str(place) + '\t' + str(func), file=f)
 
+    interpreter = Interpreter(output + 'linear_code.bin', 'test_binary')
+    interpreter.start_execute()
 
 def inverse_mapping(f):
     inv_map = {}

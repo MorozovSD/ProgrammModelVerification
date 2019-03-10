@@ -53,7 +53,7 @@ class BinaryExpression(NodeValue):
         return str(self.left) + ' ' + str(self.operand) + ' ' + str(self.right)
 
     def byte_code(self):
-        return [self.operands[self.operand], *self.left.byte_code(), *self.right.byte_code()]
+        return [*self.left.byte_code(), *self.right.byte_code(), self.operands[self.operand]]
 
 
 class UnaryExpression(NodeValue):
@@ -69,7 +69,7 @@ class UnaryExpression(NodeValue):
         return self.operand + str(self.expr)
 
     def byte_code(self):
-        return [self.operands[self.operand], *self.expr.byte_code()]
+        return [*self.expr.byte_code(), self.operands[self.operand]]
 
 
 class Parameter(NodeValue):
