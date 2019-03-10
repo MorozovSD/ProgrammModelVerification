@@ -86,21 +86,39 @@ class Parameter(NodeValue):
 
 
 class CallOrIndexer(NodeValue):
-    def __init__(self, expr, parameters, pos=None, children=None):
+    def __init__(self, path, parameters, pos=None, children=None):
         super().__init__(pos=pos, children=children)
-        self.expr = expr
+        self.path = path
         self.parameters = parameters
         from language import Identifier
-        self.call_func = None if type(self.expr) == Identifier else 'CurrentlyUnknown'
+        self.call_func = None if type(self.path) == Identifier else 'CurrentlyUnknown'
 
     def __repr__(self):
-        return str(self.expr) + '(' + str(self.parameters) + ')'
+        return str(self.path) + '(' + str(self.parameters) + ')'
 
     def byte_code(self):
         parameters = []
+        path = []
+        for p in self.path:
+            path += ['EXRP', *p.byte_code(), 'ENDEXPR']
         for p in self.parameters:
             parameters += ['EXPR', *p.byte_code(), 'ENDEXPR']
-        return ['CALL', 'EXPR', *self.expr.byte_code(), 'ENDEXPR', 'PARAM', *parameters, 'ENDPARAM']
+        return ['CALL', 'PATH', *path, 'ENDPATH', 'PARAM', *parameters, 'ENDPARAM']
+
+
+class ExternalVar(NodeValue):
+    def __init__(self, path, pos=None, children=None):
+        super().__init__(pos=pos, children=children)
+        self.path = path
+
+    def __repr__(self):
+        return str(self.path)
+
+    def byte_code(self):
+        path = []
+        for p in self.path:
+            path += ['EXRP', *p.byte_code(), 'ENDEXPR']
+        return ['EXVAR', 'PATH', *path, 'ENDPATH', 'ENDEXVAR']
 
 
 class Index(NodeValue):

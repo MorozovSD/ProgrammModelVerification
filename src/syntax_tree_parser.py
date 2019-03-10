@@ -9,6 +9,7 @@ precedence = (('nonassoc', 'LESS_EQ', 'LESS', 'MORE_EQ', 'MORE', 'NOT_EQ', 'EQUA
               ('left', 'DIVIDE', 'MUL', 'AND'),
               ('right', 'NOT', 'UMINUS'))
 
+
 def set_pos(p, index):
     line_start = p.lexer.lexdata.rfind('\n', 0, p.lexpos(index)) + 1
     return {'line': (p.lineno(index)),
@@ -21,23 +22,76 @@ def add_to_list(l, obj):
 
 
 def p_source(p):
-    """source :
-    | sourceItem"""
+    """source : sourceItem"""
     try:
-        p[0] = Source(children=[*p[1]])
+        p[0] = Source(children=[*p[1]]) if p[1] else Source()
     except IndexError:
         p[0] = Source()
 
 
 def p_sourceItem(p):
     """sourceItem :
-                  | funcDef sourceItem"""
+                  | classDef sourceItem
+                  | funcDef sourceItem
+                  | externFuncDef sourceItem
+    """
     if len(p) == 1:
         p[0] = None
     if len(p) == 3:
         p[0] = []
         p[0] = add_to_list(p[0], p[1])
         p[0] = add_to_list(p[0], p[2])
+
+
+def p_classDef(p):
+    """classDef : CLASS identifier members END CLASS"""
+    members = NodeValue(role='members', children=p[3])
+    p[0] = Class(name=p[2], members=p[3], pos=set_pos(p, 1), children=[p[2], members])
+
+
+def p_members(p):
+    """members : member
+               | member members
+    """
+    p[0] = []
+    p[0] = add_to_list(p[0], p[1])
+    if len(p) == 3:
+        p[0] = add_to_list(p[0], p[2])
+
+
+def p_member(p):
+    """member : modifier funcDef
+              | modifier field
+              | modifier externFuncDef
+              | funcDef
+              | externFuncDef
+              | field
+    """
+    modifier = None if len(p) == 2 else p[1]
+    member = p[1] if len(p) == 2 else p[2]
+    p[0] = ClassMember(modifier=modifier, member=member, pos=set_pos(p, 1), children=[member])
+
+
+def p_field(p):
+    """field : identifiers AS typeRef"""
+    names = NodeValue(role='names', children=[NodeValue(role=str(p[1]))])
+    type = NodeValue(role='type', children=[p[3]])
+    p[0] = Declaration(identifiers=p[1], type=p[3], pos=set_pos(p, 1), children=[names, type])
+
+def p_modifier(p):
+    """modifier : PUBLIC
+                | PRIVATE
+    """
+    p[0] = p[1]
+
+
+def p_externFuncDef(p):
+    """externFuncDef : DECLARE FUNCTION identifier LIB identifier
+                    | DECLARE FUNCTION identifier LIB identifier ALIAS identifier"""
+    if len(p) == 6:
+        p[0] = ExternFunction(name=p[3], lib_name=p[5], pos=set_pos(p, 1))
+    if len(p) == 8:
+        p[0] = ExternFunction(name=p[3], lib_name=p[5], alias=p[7], pos=set_pos(p, 1))
 
 
 def p_funcDef(p):
@@ -281,14 +335,27 @@ def p_braces(p):
 
 
 def p_callOrIndexer(p):
-    """callOrIndexer : expr LBRACES exprs RBRACES"""
-    parameters = []
-    for i, parameter in enumerate(p[3]):
-        parameters.append(Parameter(exprs=parameter, index=i, pos=set_pos(p, 2), children=p[3]))
-    callOrIndexer = NodeValue('callOrIndexer', children=parameters)
-    expr = NodeValue('expr', children=[p[1]])
-    p[0] = CallOrIndexer(expr=p[1], parameters=parameters, pos=set_pos(p, 2), children=[expr, callOrIndexer])
+    """callOrIndexer : path LBRACES exprs RBRACES
+                     | GET path """
+    if len(p) == 5:
+        parameters = []
+        if p[3]:
+            for i, parameter in enumerate(p[3]):
+                parameters.append(Parameter(exprs=parameter, index=i, pos=set_pos(p, 2), children=p[3]))
+        callOrIndexer = NodeValue('callOrIndexer', children=parameters)
+        path = NodeValue('path', children=[ExternalVar(path=p[1], pos=set_pos(p, 2))])
+        p[0] = CallOrIndexer(path=p[1], parameters=parameters, pos=set_pos(p, 2), children=[path, callOrIndexer])
+    if len(p) == 3:
+        p[0] = ExternalVar(path=p[2], pos=p[2][0].pos)
 
+
+def p_path(p):
+    """path : expr
+            | expr DOT path"""
+    p[0] = []
+    p[0] = add_to_list(p[0], p[1])
+    if len(p) == 4:
+        p[0] = add_to_list(p[0], p[3])
 
 def p_index(p):
     """index :  identifier SQR_LBRACES expr SQR_RBRACES

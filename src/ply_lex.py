@@ -26,10 +26,18 @@ tokens = (
     'LOOP',
     'UNTIL',
     'BREAK',
+    'DOT',
     'COMMA',
     'COLON',
     'SEMICOLON',
     'DIM',
+    'DECLARE',
+    'LIB',
+    'ALIAS',
+    'CLASS',
+    'GET',
+    'PUBLIC',
+    'PRIVATE',
     # Операции
     'PLUS',
     'MINUS',
@@ -96,11 +104,19 @@ reserved = {
     'false': 'BOOL',
     'and': 'AND',
     'or': 'OR',
-    'not': 'NOT'
+    'not': 'NOT',
+    'declare': 'DECLARE',
+    'lib': 'LIB',
+    'alias': 'ALIAS',
+    'class': 'CLASS',
+    'public': 'PUBLIC',
+    'get': 'GET',
+    'private': 'PRIVATE'
 }
 ident = r'[a-zA-Z_][a-zA-Z_0-9]*'
 dec = r'[0-9]+([xXbB][0-9A-Fa-f]+)?'
 
+t_DOT = r'\.'
 t_COMMA = r','
 t_COLON = r':'
 t_SEMICOLON = r';'

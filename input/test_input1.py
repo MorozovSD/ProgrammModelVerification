@@ -13,9 +13,14 @@
 #end if
 #end function
 #
-function test_func1111()
+
+#DECLARE FUNCTION identifier LIB identifier ALIAS identifier"
+# declare function x lib math alias id
+# declare function x lib math
+
+# function test_func1111()
 #a, b, c, d = b + ((not a) + 123) and v;
-#(5-6)*7;
+# (5-6)*7;
 #1*6+2;
 #1+6*2;
 #(1+6)*2;
@@ -23,9 +28,9 @@ function test_func1111()
 #if a then
 #a + not a;
 #else
-dim a as bool (,,,)
+#dim a as bool (,,,)
 #end if
-end function
+# end function
 #
 #
 #function test3()

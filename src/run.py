@@ -45,6 +45,8 @@ def main():
     graphs = []
     calls = {}
     functions = []
+    external = []
+    functions = []
     func_usage = {'CurrentlyUnknown': []}
     byte_code = []
     byte_code_func = {}
@@ -55,9 +57,31 @@ def main():
         asts.append(ast)
 
     for ast in asts:
-        ast_functioons = ast.get_functions()
-        functions += ast_functioons
-        for func in ast_functioons:
+        ast_external = ast.get_external()
+        ast_class = ast.get_class()
+        ast_functions = ast.get_functions()
+        external += ast_external
+        functions += ast_functions
+
+        for external in ast_external:
+            byte_code += external.byte_code()
+
+        for _class in ast_class:
+            class_func = _class.get_functions()
+            class_external = _class.get_external()
+            functions += class_func
+            for func in class_func:
+                func_usage[func] = []
+                func_path = ast.source_name.split('/')[-1][:-4] + '_' + str(_class.name) + '_' + func.signature.name
+                graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
+                graphs.append(graph_flow)
+                graph_flow.to_png(path=output, name=func_path + '_graph')
+                byte_code_func[ast.source_name + '/' + func.signature.name] = len(byte_code)
+                byte_code += func.byte_code()
+            external += class_external
+            byte_code += _class.byte_code()
+
+        for func in ast_functions:
             func_usage[func] = []
             func_path = ast.source_name.split('/')[-1][:-4] + '_' + func.signature.name
             graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
@@ -105,18 +129,14 @@ def main():
     with open(output + 'linear_code.txt', 'w', encoding='utf-8') as f:
         for i, line in enumerate(byte_code):
             print(str(i) + '\t' + str(line), file=f)
-            print(str(i) + '\t' + str(line))
+    with open(output + 'linear_code.bin', 'wb') as f:
+        for line in byte_code:
+            f.write((line + '\n').encode())
 
     print('linear_code_func_start')
     with open(output + 'linear_code_func_start.txt', 'w', encoding='utf-8') as f:
         for func, place in byte_code_func.items():
             print(str(place) + '\t' + str(func), file=f)
-            print(str(place) + '\t' + str(func))
-
-
-
-
-
 
 
 def inverse_mapping(f):

@@ -27,3 +27,9 @@ class Source(NodeValue):
 
     def get_functions(self):
         return [item for item in self.get(Function)]
+
+    def get_external(self):
+        return [item for item in self.get(ExternFunction)]
+
+    def get_class(self):
+        return [item for item in self.get(Class)]

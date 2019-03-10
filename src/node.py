@@ -65,11 +65,10 @@ class NodeValue(Node):
 
     def get(self, _type):
         list = []
-        if type(self) == _type:
-            list += [self]
         if self.children:
             for child in self.children:
-                list += child.get(_type)
+                if type(child) == _type:
+                    list += [child]
         return list
 
     def uniq_str(self):
