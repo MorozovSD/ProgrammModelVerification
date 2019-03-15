@@ -190,6 +190,18 @@ def p_identifiers(p):
         p[0] = add_to_list(p[0], p[3])
 
 
+def p_indexes(p):
+    """indexes : index COMMA indexes
+               | index"""
+    if len(p) == 2:
+        p[0] = []
+        p[0] = add_to_list(p[0], p[1])
+    if len(p) == 4:
+        p[0] = []
+        p[0] = add_to_list(p[0], p[1])
+        p[0] = add_to_list(p[0], p[3])
+
+
 def p_identifier(p):
     """identifier : IDENTIFIER"""
     p[0] = Identifier(name=p[1], type=p.slice[0].type, pos=set_pos(p, 1))
@@ -299,6 +311,7 @@ def p_binary(p):
               | expr MINUS expr
               | expr DIVIDE expr
               | expr MUL expr
+              | expr LESS expr
               | expr LESS_EQ expr
               | expr MORE_EQ expr
               | expr MORE expr
@@ -321,6 +334,7 @@ def p_unary(p):
 
 def p_assignment(p):
     """assignment : identifiers ASSIGNMENT expr
+                  | indexes ASSIGNMENT expr
     """
     identifiers = NodeValue(role='identifiers', children=[NodeValue(role=str(p[1]))])
     value = NodeValue(role='value', children=[p[3]])
@@ -356,6 +370,7 @@ def p_path(p):
     p[0] = add_to_list(p[0], p[1])
     if len(p) == 4:
         p[0] = add_to_list(p[0], p[3])
+
 
 def p_index(p):
     """index :  identifier SQR_LBRACES expr SQR_RBRACES

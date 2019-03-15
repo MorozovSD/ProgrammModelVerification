@@ -35,13 +35,17 @@ class Identifier(NodeValue):
 class Argument(NodeValue):
     def __init__(self, identifier, expected_type=None, children=None):
         super().__init__(pos=identifier.pos, children=children)
-        self.value = identifier.value
-        self.type = identifier.type
-        self.name = identifier.name
+        self.identifier = identifier
         self.expected_type = expected_type
 
     def __repr__(self):
-        return str(self.name) + ' as ' + str(self.expected_type)
+        return str(self.identifier.name) + ' as ' + str(self.expected_type)
+
+    def byte_code_dim(self):
+        return ['DIM', *self.identifier.byte_code(), *self.expected_type.byte_code()]
+
+    def byte_code_assign(self):
+        return ['ASSIGN', *self.identifier.byte_code(), 'POP', 'ENDEXPR']
 
 
 class Array(NodeValue):
@@ -54,4 +58,4 @@ class Array(NodeValue):
         return 'array of ' + str(self.type)
 
     def byte_code(self):
-        return ['ARRAY', str(self.len), *self.type.byte_code(),  'EARRAY']
+        return ['ARRAY', str(self.len), *self.type.byte_code()]

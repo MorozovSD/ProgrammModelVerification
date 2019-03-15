@@ -27,20 +27,25 @@ class If(Statements):
         for stmt in self.then_stmt:
             then_byte += stmt.byte_code()
         expr_byte = self.expr.byte_code()
-        stmt_stack += ['EXPR',
-                       'EQJUMP ' + str(len(then_byte) + 1),
+
+        then_jump = str(len(then_byte) + 4) if self.else_stmt else str(len(then_byte) + 3)
+
+        stmt_stack += ['IF',
                        *expr_byte,
-                       'TRUE',
-                       'ENDEXPR']
-        stmt_stack += then_byte
+                       'ENDEXPR',
+                       'JUMP ' + then_jump]
+        stmt_stack += ['BLOCK', *then_byte]
 
         if self.else_stmt:
             else_byte = []
             for stmt in self.else_stmt:
                 else_byte += stmt.byte_code()
-            stmt_stack.append('JUMP ' + str(len(else_byte) + 1))
-            stmt_stack += else_byte
-
+            else_jump = str(len(else_byte) + 3)
+            stmt_stack += ['JUMP ' + else_jump,
+                           'ENDBLOCK',
+                           'BLOCK',
+                           *else_byte]
+        stmt_stack += ['ENDBLOCK']
         return stmt_stack
 
 
@@ -60,20 +65,22 @@ class While(Statements):
             do_byte += stmt.byte_code()
 
         if self.loop_type == 'until':
-            stmt_stack += [*do_byte,
-                           'EXPR',
-                           'EQJUMP -' + str(len(do_byte) + 2),
-                           *loop_byte,
-                           'TRUE',
-                           'ENDEXPR']
-        else:
-            stmt_stack += ['EXPR',
-                           'EQJUMP ' + str(len(do_byte) + 2),
-                           *loop_byte,
-                           'TRUE',
-                           'ENDEXPR',
+            stmt_stack += ['LOOP',
                            *do_byte,
-                           'JUMP -' + str(len(loop_byte) + len(do_byte) + 4)]
+                           'IF',
+                           *loop_byte,
+                           'ENDEXPR',
+                           'JUMP -' + str(len(do_byte) + len(do_byte) + 3),
+                           'ENDLOOP']
+        else:
+            stmt_stack += ['LOOP',
+                           'IF',
+                           *loop_byte,
+                           'ENDEXPR',
+                           'JUMP ' + str(len(do_byte) + 2),
+                           *do_byte,
+                           'JUMP -' + str(len(loop_byte) + len(do_byte) + 3),
+                           'ENDLOOP']
         return stmt_stack
 
 
@@ -102,7 +109,7 @@ class Assignment(Statements):
     def byte_code(self):
         stmt_stack = []
         for id in self.identifiers:
-            stmt_stack += ['ASSIGN', *id.byte_code(), 'EXPR', *self.expr.byte_code(), 'ENDEXPR']
+            stmt_stack += ['ASSIGN', *id.byte_code(), *self.expr.byte_code(), 'ENDEXPR']
         return stmt_stack
 
 

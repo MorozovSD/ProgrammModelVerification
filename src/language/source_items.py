@@ -16,6 +16,17 @@ class FuncSignature(NodeValue):
     def uniq_str(self):
         return 'funcSignature (id: ' + self.id + ')'
 
+    def byte_code(self):
+        func_stack = []
+        params_type = ''
+        if self.args:
+            for arg in filter(None, self.args):
+                func_stack += arg.byte_code_dim()
+                params_type += str(arg.expected_type.role) + '_'
+            for arg in filter(None, reversed(self.args)):
+                func_stack += arg.byte_code_assign()
+        return ['FUNC ' + str(self.name) + ' ' + params_type[:-1]] + func_stack
+
 
 class Function(NodeValue):
     def __init__(self, signature, statements, pos=None, type=None, children=None):
@@ -31,8 +42,15 @@ class Function(NodeValue):
     def uniq_str(self):
         return str(self.source_name) + '/' + str(self.signature.name) + ' (id: ' + self.id + ')'
 
+    def args(self):
+        params_type = ''
+        if self.signature.args:
+            for arg in filter(None, self.signature.args):
+                params_type += str(arg.expected_type.role) + '_'
+        return params_type[:-1] + ' '
+
     def byte_code(self):
-        func_stack = ['FUNC ' + str(self.signature.name)]
+        func_stack = [*self.signature.byte_code()]
         if self.statements:
             for statement in filter(None, self.statements):
                 func_stack += statement.byte_code()

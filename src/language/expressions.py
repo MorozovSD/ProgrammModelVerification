@@ -100,10 +100,10 @@ class CallOrIndexer(NodeValue):
         parameters = []
         path = []
         for p in self.path:
-            path += ['EXRP', *p.byte_code(), 'ENDEXPR']
+            path += [*p.byte_code(), 'ENDEXPR']
         for p in self.parameters:
-            parameters += ['EXPR', *p.byte_code(), 'ENDEXPR']
-        return ['CALL', 'PATH', *path, 'ENDPATH', 'PARAM', *parameters, 'ENDPARAM']
+            parameters += [*p.byte_code(), 'ENDEXPR']
+        return ['CALL', *path, 'PARAM', *parameters, 'ENDPARAM']
 
 
 class ExternalVar(NodeValue):
@@ -131,4 +131,4 @@ class Index(NodeValue):
         return str(self.name) + '(' + str(self.index) + ')'
 
     def byte_code(self):
-        return ['INDEX', *self.name.byte_code(), 'EXPR',  *self.index.byte_code(), 'ENDEXPR']
+        return ['INDEX', *self.name.byte_code(), *self.index.byte_code(), 'ENDEXPR']
