@@ -22,7 +22,7 @@ class Source(NodeValue):
         calls = {}
         if self.source_items:
             for item in self.source_items:
-                calls[item] = item.get(CallOrIndexer)
+                calls[item] = item.recursive_get(CallOrIndexer)
         return calls
 
     def get_functions(self):

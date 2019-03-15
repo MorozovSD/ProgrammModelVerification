@@ -395,37 +395,37 @@ def p_literal(p):
     type = NodeValue(role='type', children=[NodeValue(role=p[1][0])])
     value = NodeValue(role='value', children=[NodeValue(role=p[1][1])])
     literal = NodeValue(role='literal', children=[type, value])
-    p[0] = Literal(value=p[1][0], type=p[1][1], pos=set_pos(p, 1), children=[literal])
+    p[0] = Literal(value=p[1][0], type=p[1][1], pos=p[1][2], children=[literal])
 
 
 def p_str(p):
     """str : STR"""
-    p[0] = p[1].replace('"', ''), p.slice[0].type
+    p[0] = p[1].replace('"', ''), p.slice[0].type, set_pos(p, 1)
 
 
 def p_char(p):
     """char : CHAR"""
-    p[0] = p[1].replace('\'', ''), p.slice[0].type
+    p[0] = p[1].replace('\'', ''), p.slice[0].type, set_pos(p, 1)
 
 
 def p_hex(p):
     """hex : HEX"""
-    p[0] = p[1], p.slice[0].type
+    p[0] = p[1], p.slice[0].type, set_pos(p, 1)
 
 
 def p_bits(p):
     """bits : BITS"""
-    p[0] = p[1], p.slice[0].type
+    p[0] = p[1], p.slice[0].type, set_pos(p, 1)
 
 
 def p_dec(p):
     """dec : DEC"""
-    p[0] = p[1], p.slice[0].type
+    p[0] = p[1], p.slice[0].type, set_pos(p, 1)
 
 
 def p_bool(p):
     """bool : BOOL"""
-    p[0] = p[1], p.slice[0].type
+    p[0] = p[1], p.slice[0].type, set_pos(p, 1)
 
 
 def p_error(p):

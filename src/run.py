@@ -54,7 +54,7 @@ def main():
     for file in input:
         file_name = file.split('/')[-1][:-4]
         ast = parse_tokens(file)
-        ast.export(output_path=output, name=file_name, detailed=verbose)
+        ast.export(output_path=output, name='ast_' + file_name, detailed=verbose)
         asts.append(ast)
 
     for ast in asts:
@@ -77,7 +77,7 @@ def main():
                 func_path = ast.source_name.split('/')[-1][:-4] + '_' + str(_class.name) + '_' + func.signature.name
                 graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
                 graphs.append(graph_flow)
-                graph_flow.to_png(path=output, name=func_path + '_graph')
+                # graph_flow.to_png(path=output, name=func_path + '_graph')
                 byte_code_func[ast.source_name + '/' + func.signature.name] = len(byte_code)
                 byte_code += func.byte_code()
             # external += class_external
@@ -88,49 +88,32 @@ def main():
             func_path = ast.source_name.split('/')[-1][:-4] + '_' + func.signature.name
             graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
             graphs.append(graph_flow)
-            graph_flow.to_png(path=output, name=func_path + '_graph')
+            # graph_flow.to_png(path=output, name=func_path + '_graph')
             # byte_code_func[ast.source_name + '/' + func.signature.name] = len(byte_code)
             byte_code_func[func.signature.name + ' ' + func.args()] = len(byte_code)
             byte_code += func.byte_code()
         calls.update(ast.get_calls())
 
+    # Unused code for func usage graph
     for calls_path, _calls in calls.items():
         for call in filter(None, _calls):
             for func in functions:
-                if str(call.expr) == str(func.signature.name):
+                if str(call.path[0]) == str(func.signature.name):
                     try:
-                        if not call.call_func:
-                            call.call_func = func
-                            if calls_path not in func_usage[func]:
-                                func_usage[func].append(calls_path)
-                        else:
-                            raise FunctionSourceException()
+                        # if not call.call_func:
+                        call.call_func = func
+                        if calls_path not in func_usage[func]:
+                            func_usage[func].append(calls_path)
+                        # else:
+                        #     raise FunctionSourceException()
                     except FunctionSourceException as e:
-                        print(e.message % (call.expr, calls_path, call.call_func))
+                        print(e.message % (call.path[0], calls_path, call.call_func))
                         exit(3)
-                else:
-                    func_usage[call.uniq_str()] = []
-                    if call.call_func == 'CurrentlyUnknown' and calls_path not in func_usage[call.uniq_str()]:
-                        func_usage[call.uniq_str()] = [calls_path]
-
-    for calls_path, _calls in calls.items():
-        for call in filter(None, _calls):
-            try:
-                if not call.call_func:
-                    raise UnknownFunctionException()
-                else:
-                    print(call.call_func)
-            except UnknownFunctionException as e:
-                print(e.message % call.expr)
-                exit(3)
-
-    # Graph.print(func_usage)
-    # Graph.print(inverse_mapping(func_usage))
-    Graph.to_png(inverse_mapping(func_usage), output, 'Functions Calls')
-
-    with open(output + 'linear_code.txt', 'w', encoding='utf-8') as f:
-        for i, line in enumerate(byte_code):
-            print(str(i) + '\t' + str(line), file=f)
+                # else:
+                    # func_usage[call.uniq_str()] = []
+                    # if call.call_func == 'CurrentlyUnknown' and calls_path not in func_usage[call.uniq_str()]:
+                    #     func_usage[call.uniq_str()] = [calls_path]
+    # Graph.to_png(inverse_mapping(func_usage), output, 'functions_calls')
 
     with open(output + 'linear_code.bin', 'wb') as f:
         f.write('CONTEXT\n'.encode())
@@ -141,11 +124,6 @@ def main():
         f.write('ENDCONTEXT\n'.encode())
         for i, line in enumerate(byte_code):
             f.write((line + '\n').encode())
-
-    with open(output + 'linear_code_func_start.txt', 'w', encoding='utf-8') as f:
-        for func, place in byte_code_func.items():
-            print(str(place) + '\t' + str(func), file=f)
-
     interpreter = Interpreter(output + 'linear_code.bin')
     interpreter.start_execute()
 

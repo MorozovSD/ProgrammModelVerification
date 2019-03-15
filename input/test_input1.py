@@ -39,6 +39,6 @@
 #test1(false, "fq1");
 #end function
 #
-#function test4()
-#test1(false, "fq1");
-#end function
+# function test4()
+# main();
+# end function

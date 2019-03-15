@@ -96,6 +96,7 @@ class Interpreter:
         print(self.context)
         self.index = self.find_func('main', None)
         self.stack = []
+        print(self.commands)
 
     def parse_context(self):
         end_context = self.commands.index('ENDCONTEXT')
@@ -175,10 +176,10 @@ class Interpreter:
 
     def base_executor(self, context=None):
         context = context if context else deepcopy(self.context)
-        context['stack_trace'].append(self.current()[1])
         # print(context)
         while self.current()[0] not in ['EFUNC', 'ENDBLOCK', 'ENDLOOP', '']:
-            # print(self)
+            print(self)
+            # print(context)
             if self.current()[0] == 'EXPR':
                 self.expr_executor(context=context)
                 self.next()
@@ -222,6 +223,7 @@ class Interpreter:
                 continue
 
             if self.current()[0] == 'IF':
+                self.next()
                 self.expr_executor(context=context)
                 if self.stack.pop():
                     self.next()
@@ -249,17 +251,18 @@ class Interpreter:
                 continue
 
             if self.current()[0] == 'FUNC':
+                context['stack_trace'].append(self.current()[1])
                 self.next()
                 continue
 
             print('Unexpected command %s' % self.current())
             exit(5)
-        print(self.context)
+        # print(self.context)
 
     def expr_executor(self, context):
         expr_stack = []
         while self.current():
-            # print('\t' + str(self))
+            print('\t' + str(self))
             # print('\t' + str(expr_stack))
             if self.current()[0] in bin_ops.keys():
                 right = expr_stack.pop()
@@ -362,15 +365,15 @@ class Interpreter:
                 self.next()
                 continue
 
-            if self.current()[0] == 'ENDEXPR':
-                self.stack.extend(expr_stack)
-                return
-
             if self.current()[0] == 'EXPR':
                 self.next()
                 continue
 
-            print('Unexpected command %s' % self.current())
+            if self.current()[0] == 'ENDEXPR':
+                self.stack.extend(expr_stack)
+                return
+
+            print('Unexpected expr command %s' % self.current())
             exit(5)
 
     def dim_executer(self, context):
@@ -396,44 +399,44 @@ class Interpreter:
                 return
 
 
-def usage():
-    print("""Run example:
-    python interpreter.py -i ../output/linear_code.bin, -s test_binary
-    Arguments:
-    -i (--input)  - input files
-    -s (--start)  - starting function
-    -v            - detailed output
-    --help        - help
-    """)
-
-
-def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'vi:o:v', ['help', 'start=', 'input='])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-    start_func = ''
-    input = None
-    verbose = False
-    for o, a in opts:
-        if o == '-v':
-            verbose = True
-        if o in ('-h', '--help'):
-            usage()
-            sys.exit()
-        if o in ('-s', '--start'):
-            start_func = a
-        if o in ('-i', '--input'):
-            input = a.split(',')
-    if input is None:
-        print('Input file doesn\'t set. Use -i to set input files')
-        usage()
-        sys.exit(2)
-
-    interpreter = Interpreter(input, start_func)
-    interpreter.start_execute()
-
-
-if __name__ == "__main__":
-    main()
+# def usage():
+#     print("""Run example:
+#     python interpreter.py -i ../output/linear_code.bin, -s test_binary
+#     Arguments:
+#     -i (--input)  - input files
+#     -s (--start)  - starting function
+#     -v            - detailed output
+#     --help        - help
+#     """)
+#
+#
+# def main():
+#     try:
+#         opts, args = getopt.getopt(sys.argv[1:], 'vi:o:v', ['help', 'start=', 'input='])
+#     except getopt.GetoptError:
+#         usage()
+#         sys.exit(2)
+#     start_func = ''
+#     input = None
+#     verbose = False
+#     for o, a in opts:
+#         if o == '-v':
+#             verbose = True
+#         if o in ('-h', '--help'):
+#             usage()
+#             sys.exit()
+#         if o in ('-s', '--start'):
+#             start_func = a
+#         if o in ('-i', '--input'):
+#             input = a.split(',')
+#     if input is None:
+#         print('Input file doesn\'t set. Use -i to set input files')
+#         usage()
+#         sys.exit(2)
+#
+#     interpreter = Interpreter(input, start_func)
+#     interpreter.start_execute()
+#
+#
+# if __name__ == "__main__":
+#     main()

@@ -1,13 +1,18 @@
+import os
 import pprint
 from subprocess import check_call, CalledProcessError
 from language import *
 from node import NodeValue
 
 
+
 class Graph:
     @staticmethod
     def to_png(graph, path, name):
-        with open(path + name[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
+        filename = path + 'temp/' + name[:-4] + '.dot'
+        if not os.path.exists(os.path.dirname(filename)):
+                os.makedirs(os.path.dirname(filename))
+        with open(filename, 'w', encoding='utf-8') as dotfile:
             dotfile.write(Graph.dot_type(graph))
             dotfile.flush()
             try:
@@ -123,7 +128,10 @@ class GraphFlow(Graph):
     #     GraphFlow.to_png(self.dict, path, name)
 
     def to_png(self, path, name):
-        with open(path + name[:-4] + '.dot', 'w', encoding='utf-8') as dotfile:
+        filename = path + 'temp/' + name[:-4] + '.dot'
+        if not os.path.exists(os.path.dirname(filename)):
+                os.makedirs(os.path.dirname(filename))
+        with open(filename, 'w', encoding='utf-8') as dotfile:
             dotfile.write(GraphFlow.dot_type(self.dict))
             dotfile.flush()
             try:

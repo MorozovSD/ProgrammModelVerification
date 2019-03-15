@@ -71,6 +71,15 @@ class NodeValue(Node):
                     list += [child]
         return list
 
+    def recursive_get(self, _type):
+        list = []
+        if type(self) == _type:
+            list += [self]
+        if self.children:
+            for child in self.children:
+                list += child.recursive_get(_type)
+        return list
+
     def uniq_str(self):
         return str(self) + ' (id: ' + self.id + ')'
 
