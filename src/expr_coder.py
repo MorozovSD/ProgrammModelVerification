@@ -24,18 +24,23 @@ class req:
 class registry:
     def __init__(self):
         self.temp_var_id = 0
-        self.out_reg = req('free', '#out')
         self.registry_int = [req('free', '#i1'),
                              req('free', '#i2'),
-                             req('free', '#i3')]
+                             req('free', '#i3'),
+                             req('free', '#i4'),
+                             req('free', '#i5')]
 
         self.registry_str = [req('free', '#s1'),
                              req('free', '#s2'),
-                             req('free', '#s3')]
+                             req('free', '#s3'),
+                             req('free', '#s4'),
+                             req('free', '#s5')]
 
         self.registry_bool = [req('free', '#b1'),
                               req('free', '#b2'),
-                              req('free', '#b3')]
+                              req('free', '#b3'),
+                              req('free', '#b4'),
+                              req('free', '#b5')]
 
     def free(self, value):
         for reg in self.registry_int:
@@ -147,12 +152,17 @@ class ExprCoder:
             if self.current()[0] in bin_ops:
                 right = expr_stack.pop()
                 left = expr_stack.pop()
-                self.registry_command.append(self.current()[0] + ' ' + left + ' ' + right)
+                to = self.registry.find_free(self.current()[1])
+                self.registry_command.append(self.current()[0] + ' ' + left + ' ' + right + ' ' + to)
                 if right[:2] == '#T':
                     self.registry_command.append('REMOVE ' + right)
                 else:
                     self.registry.free(right)
-                expr_stack.append(left)
+                if left[:2] == '#T':
+                    self.registry_command.append('REMOVE ' + left)
+                else:
+                    self.registry.free(left)
+                expr_stack.append(to)
                 self.next()
                 continue
 
@@ -238,11 +248,7 @@ class ExprCoder:
             #     continue
 
             if self.current()[0] == 'ENDEXPR':
-                if self.registry.out_reg.state == 'busy':
-                    print(WARNING + 'Out register is busy is it normal?' + ENDC)
-                self.registry_command.append('ENDEXPR ' + self.registry.out_reg.value + ' ' + expr_stack.pop())
-                self.registry.out_reg.state = 'busy'
-                self.registry.free_all()
+                self.registry_command.append('ENDEXPR')
                 return self.registry_command
 
             print('Unexpected expr command %s' % self.current())

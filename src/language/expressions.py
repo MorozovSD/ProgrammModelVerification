@@ -20,13 +20,13 @@ def type_comparison(elem, list):
     return set(elem).issubset(list)
 
 
-int_like = ['dec', 'hex', 'bits', 'int', 'uint', 'long', 'ulong']
+int_like = ['int', 'dec', 'hex', 'bits', 'uint', 'long', 'ulong']
 str_like = ['string', 'char']
 bool_like = ['bool']
-type_conversion = {'dec': int_like,
+type_conversion = {'int': int_like,
+                   'dec': int_like,
                    'hex': int_like,
                    'bits': int_like,
-                   'int': int_like,
                    'uint': int_like,
                    'long': int_like,
                    'ulong': int_like,
@@ -141,6 +141,7 @@ class BinaryExpression(Expression):
         self.left = left
         self.right = right
         self.operand = operand
+        self.type = None
 
     def get_type(self, context):
         left = self.left.get_type(context)
@@ -148,6 +149,7 @@ class BinaryExpression(Expression):
 
         for bin_ops_type in bin_ops[self.operands[self.operand]]:
             if type_comparison(left, bin_ops_type.left) and type_comparison(right, bin_ops_type.right):
+                self.type = bin_ops_type.result[0]
                 return bin_ops_type.result
         raise BinaryTypeException(left=left, right=right, operand=self.operand, pos=self.pos)
 
@@ -155,7 +157,7 @@ class BinaryExpression(Expression):
         return str(self.left) + ' ' + str(self.operand) + ' ' + str(self.right)
 
     def byte_code(self):
-        return [*self.left.byte_code(), *self.right.byte_code(), self.operands[self.operand]]
+        return [*self.left.byte_code(), *self.right.byte_code(), self.operands[self.operand] + ' ' + self.type.upper()]
 
 
 class UnaryExpression(Expression):
@@ -166,19 +168,21 @@ class UnaryExpression(Expression):
         super().__init__(pos=pos, children=children)
         self.expr = expr
         self.operand = operand
+        self.type = None
 
     def __repr__(self):
         return self.operand + str(self.expr)
 
     def byte_code(self):
-        return [*self.expr.byte_code(), self.operands[self.operand]]
+        return [*self.expr.byte_code(), self.operands[self.operand] + ' ' + self.type.upper()]
 
     def get_type(self, context):
         expr = self.expr.get_type(context)
 
-        for bin_ops_type in un_ops[self.operands[self.operand]]:
-            if type_comparison(expr, bin_ops_type.left):
-                return bin_ops_type.result
+        for un_ops_type in un_ops[self.operands[self.operand]]:
+            if type_comparison(expr, un_ops_type.left):
+                self.type = un_ops_type.result[0]
+                return un_ops_type.result
         raise UnaryTypeException(expr=expr, operand=self.operand, pos=self.pos)
 
 

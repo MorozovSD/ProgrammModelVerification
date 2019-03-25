@@ -5,214 +5,36 @@
     │   │   └── main
     │   └── argDefs
     └── statements
-        ├── dim [a] as type int : 5 : Line 5
-        │   └── dim
-        │       ├── names
-        │       │   └── [a]
-        │       └── type
-        │           └── int : 5
-        ├── [a] = (0 + a) + (2 + (5 + 6)) + a + (2 + (5 + 6)) + a : Line 6
-        │   └── assignment
-        │       ├── identifiers
-        │       │   └── [a]
-        │       └── value
-        │           └── (0 + a) + (2 + (5 + 6)) + a + (2 + (5 + 6)) + a
-        │               └── +
-        │                   ├── (0 + a) + (2 + (5 + 6)) + a + (2 + (5 + 6))
-        │                   │   └── +
-        │                   │       ├── (0 + a) + (2 + (5 + 6)) + a
-        │                   │       │   └── +
-        │                   │       │       ├── (0 + a) + (2 + (5 + 6))
-        │                   │       │       │   └── +
-        │                   │       │       │       ├── (0 + a)
-        │                   │       │       │       │   └── braces
-        │                   │       │       │       │       └── 0 + a
-        │                   │       │       │       │           └── +
-        │                   │       │       │       │               ├── 0
-        │                   │       │       │       │               │   └── literal
-        │                   │       │       │       │               │       ├── type
-        │                   │       │       │       │               │       │   └── 0
-        │                   │       │       │       │               │       └── value
-        │                   │       │       │       │               │           └── dec
-        │                   │       │       │       │               └── a
-        │                   │       │       │       └── (2 + (5 + 6))
-        │                   │       │       │           └── braces
-        │                   │       │       │               └── 2 + (5 + 6)
-        │                   │       │       │                   └── +
-        │                   │       │       │                       ├── 2
-        │                   │       │       │                       │   └── literal
-        │                   │       │       │                       │       ├── type
-        │                   │       │       │                       │       │   └── 2
-        │                   │       │       │                       │       └── value
-        │                   │       │       │                       │           └── dec
-        │                   │       │       │                       └── (5 + 6)
-        │                   │       │       │                           └── braces
-        │                   │       │       │                               └── 5 + 6
-        │                   │       │       │                                   └── +
-        │                   │       │       │                                       ├── 5
-        │                   │       │       │                                       │   └── literal
-        │                   │       │       │                                       │       ├── type
-        │                   │       │       │                                       │       │   └── 5
-        │                   │       │       │                                       │       └── value
-        │                   │       │       │                                       │           └── dec
-        │                   │       │       │                                       └── 6
-        │                   │       │       │                                           └── literal
-        │                   │       │       │                                               ├── type
-        │                   │       │       │                                               │   └── 6
-        │                   │       │       │                                               └── value
-        │                   │       │       │                                                   └── dec
-        │                   │       │       └── a
-        │                   │       └── (2 + (5 + 6))
-        │                   │           └── braces
-        │                   │               └── 2 + (5 + 6)
-        │                   │                   └── +
-        │                   │                       ├── 2
-        │                   │                       │   └── literal
-        │                   │                       │       ├── type
-        │                   │                       │       │   └── 2
-        │                   │                       │       └── value
-        │                   │                       │           └── dec
-        │                   │                       └── (5 + 6)
-        │                   │                           └── braces
-        │                   │                               └── 5 + 6
-        │                   │                                   └── +
-        │                   │                                       ├── 5
-        │                   │                                       │   └── literal
-        │                   │                                       │       ├── type
-        │                   │                                       │       │   └── 5
-        │                   │                                       │       └── value
-        │                   │                                       │           └── dec
-        │                   │                                       └── 6
-        │                   │                                           └── literal
-        │                   │                                               ├── type
-        │                   │                                               │   └── 6
-        │                   │                                               └── value
-        │                   │                                                   └── dec
-        │                   └── a
         ├── dim [a] as type bool : 7 : Line 7
         │   └── dim
         │       ├── names
         │       │   └── [a]
         │       └── type
         │           └── bool : 7
-        ├── [a] = 5 > 3 + 3 : Line 8
-        │   └── assignment
-        │       ├── identifiers
-        │       │   └── [a]
-        │       └── value
-        │           └── 5 > 3 + 3
-        │               └── >
-        │                   ├── 5
-        │                   │   └── literal
-        │                   │       ├── type
-        │                   │       │   └── 5
-        │                   │       └── value
-        │                   │           └── dec
-        │                   └── 3 + 3
-        │                       └── +
-        │                           ├── 3
-        │                           │   └── literal
-        │                           │       ├── type
-        │                           │       │   └── 3
-        │                           │       └── value
-        │                           │           └── dec
-        │                           └── 3
-        │                               └── literal
-        │                                   ├── type
-        │                                   │   └── 3
-        │                                   └── value
-        │                                       └── dec
-        ├── [a] = (5 > 3) and (false or true) : Line 9
-        │   └── assignment
-        │       ├── identifiers
-        │       │   └── [a]
-        │       └── value
-        │           └── (5 > 3) and (false or true)
-        │               └── and
-        │                   ├── (5 > 3)
-        │                   │   └── braces
-        │                   │       └── 5 > 3
-        │                   │           └── >
-        │                   │               ├── 5
-        │                   │               │   └── literal
-        │                   │               │       ├── type
-        │                   │               │       │   └── 5
-        │                   │               │       └── value
-        │                   │               │           └── dec
-        │                   │               └── 3
-        │                   │                   └── literal
-        │                   │                       ├── type
-        │                   │                       │   └── 3
-        │                   │                       └── value
-        │                   │                           └── dec
-        │                   └── (false or true)
-        │                       └── braces
-        │                           └── false or true
-        │                               └── or
-        │                                   ├── false
-        │                                   │   └── literal
-        │                                   │       ├── type
-        │                                   │       │   └── false
-        │                                   │       └── value
-        │                                   │           └── bool
-        │                                   └── true
-        │                                       └── literal
-        │                                           ├── type
-        │                                           │   └── true
-        │                                           └── value
-        │                                               └── bool
-        ├── dim [b] as type int : 11 : Line 11
-        │   └── dim
-        │       ├── names
-        │       │   └── [b]
-        │       └── type
-        │           └── int : 11
-        ├── dim [c] as type bool : 12 : Line 12
-        │   └── dim
-        │       ├── names
-        │       │   └── [c]
-        │       └── type
-        │           └── bool : 12
-        ├── if : Line 14
-        │   ├── if
-        │   │   └── c
-        │   └── then
-        │       ├── [a] = false : Line 15
-        │       │   └── assignment
-        │       │       ├── identifiers
-        │       │       │   └── [a]
-        │       │       └── value
-        │       │           └── false
-        │       │               └── literal
-        │       │                   ├── type
-        │       │                   │   └── false
-        │       │                   └── value
-        │       │                       └── bool
-        │       ├── dim [a] as type int : 16 : Line 16
-        │       │   └── dim
-        │       │       ├── names
-        │       │       │   └── [a]
-        │       │       └── type
-        │       │           └── int : 16
-        │       └── [a] = 111 : Line 17
-        │           └── assignment
-        │               ├── identifiers
-        │               │   └── [a]
-        │               └── value
-        │                   └── 111
-        │                       └── literal
-        │                           ├── type
-        │                           │   └── 111
-        │                           └── value
-        │                               └── dec
-        └── [a] = false : Line 19
+        └── [a] = 5 > 3 + 3 : Line 8
             └── assignment
                 ├── identifiers
                 │   └── [a]
                 └── value
-                    └── false
-                        └── literal
-                            ├── type
-                            │   └── false
-                            └── value
-                                └── bool
+                    └── 5 > 3 + 3
+                        └── >
+                            ├── 5
+                            │   └── literal
+                            │       ├── type
+                            │       │   └── 5
+                            │       └── value
+                            │           └── dec
+                            └── 3 + 3
+                                └── +
+                                    ├── 3
+                                    │   └── literal
+                                    │       ├── type
+                                    │       │   └── 3
+                                    │       └── value
+                                    │           └── dec
+                                    └── 3
+                                        └── literal
+                                            ├── type
+                                            │   └── 3
+                                            └── value
+                                                └── dec

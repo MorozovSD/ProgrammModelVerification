@@ -3,73 +3,13 @@ main  0
 ENDCONTEXT
 FUNC main 
 DIM
-VAR INT a
-ASSIGN
-VAR INT a
-LOAD #i1 0
-LOAD #i2 a
-ADD #i1 #i2
-LOAD #i2 2
-LOAD #i3 5
-LOAD #TEMP_1 6
-ADD #i3 #TEMP_1
-REMOVE #TEMP_1
-ADD #i2 #i3
-ADD #i1 #i2
-LOAD #i2 a
-ADD #i1 #i2
-LOAD #i2 2
-LOAD #i3 5
-LOAD #TEMP_2 6
-ADD #i3 #TEMP_2
-REMOVE #TEMP_2
-ADD #i2 #i3
-ADD #i1 #i2
-LOAD #i2 a
-ADD #i1 #i2
-ENDEXPR #out #i1
-DIM
 VAR BOOL a
 ASSIGN
 VAR BOOL a
 LOAD #i1 5
 LOAD #i2 3
 LOAD #i3 3
-ADD #i2 #i3
-MORE #i1 #i2
-ENDEXPR #out #i1
-ASSIGN
-VAR BOOL a
-LOAD #i1 5
-LOAD #i2 3
-MORE #i1 #i2
-LOAD #b1 false
-LOAD #b2 true
-OR #b1 #b2
-AND #i1 #b1
-ENDEXPR #out #i1
-DIM
-VAR INT b
-DIM
-VAR BOOL c
-IF
-LOAD #b1 c
-ENDEXPR #out #b1
-JUMP 13
-BLOCK
-ASSIGN
-VAR BOOL a
-LOAD #b1 false
-ENDEXPR #out #b1
-DIM
-VAR INT a
-ASSIGN
-VAR INT a
-LOAD #i1 111
-ENDEXPR #out #i1
-ENDBLOCK
-ASSIGN
-VAR BOOL a
-LOAD #b1 false
-ENDEXPR #out #b1
+ADD #i2 #i3 #i4
+MORE #i1 #i4 #b1
+ENDEXPR
 EFUNC
