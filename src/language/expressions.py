@@ -1,4 +1,5 @@
 from Exeptions import UnknownVariableException, VariableTypeException, BinaryTypeException, UnaryTypeException
+from expr_coder import ExprCoder
 from node import NodeValue
 
 
@@ -87,7 +88,7 @@ class Expression(NodeValue):
         return str(self.expr) + ' (id: ' + self.id + ')'
 
     def byte_code(self):
-        return ['EXPR', *self.expr.byte_code(), 'ENDEXPR']
+        return ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()
 
     def check_idendifer(self, context):
         from language import Identifier

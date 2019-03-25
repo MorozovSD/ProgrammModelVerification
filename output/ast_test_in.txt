@@ -1,303 +1,218 @@
 ../input/test_int.py
-├── ../input/test_int.py/main : Line 4
-│   ├── funcSignature : Line 0
-│   │   ├── identifier
-│   │   │   └── main
-│   │   └── argDefs
-│   └── statements
-│       ├── dim [b] as type bool : 5 : Line 5
-│       │   └── dim
-│       │       ├── names
-│       │       │   └── [b]
-│       │       └── type
-│       │           └── bool : 5
-│       ├── [called_binary2]([true, false]) : Line 6
-│       │   └── expression
-│       │       └── [called_binary2]([true, false])
-│       │           ├── path
-│       │           │   └── [called_binary2]
-│       │           └── callOrIndexer
-│       │               ├── true
-│       │               │   ├── true
-│       │               │   │   └── literal
-│       │               │   │       ├── type
-│       │               │   │       │   └── true
-│       │               │   │       └── value
-│       │               │   │           └── bool
-│       │               │   └── false
-│       │               │       └── literal
-│       │               │           ├── type
-│       │               │           │   └── false
-│       │               │           └── value
-│       │               │               └── bool
-│       │               └── false
-│       │                   ├── true
-│       │                   │   └── literal
-│       │                   │       ├── type
-│       │                   │       │   └── true
-│       │                   │       └── value
-│       │                   │           └── bool
-│       │                   └── false
-│       │                       └── literal
-│       │                           ├── type
-│       │                           │   └── false
-│       │                           └── value
-│       │                               └── bool
-│       ├── [(called + _binary)]([1, 2]) : Line 7
-│       │   └── expression
-│       │       └── [(called + _binary)]([1, 2])
-│       │           ├── path
-│       │           │   └── [(called + _binary)]
-│       │           └── callOrIndexer
-│       │               ├── 1
-│       │               │   ├── 1
-│       │               │   │   └── literal
-│       │               │   │       ├── type
-│       │               │   │       │   └── 1
-│       │               │   │       └── value
-│       │               │   │           └── dec
-│       │               │   └── 2
-│       │               │       └── literal
-│       │               │           ├── type
-│       │               │           │   └── 2
-│       │               │           └── value
-│       │               │               └── dec
-│       │               └── 2
-│       │                   ├── 1
-│       │                   │   └── literal
-│       │                   │       ├── type
-│       │                   │       │   └── 1
-│       │                   │       └── value
-│       │                   │           └── dec
-│       │                   └── 2
-│       │                       └── literal
-│       │                           ├── type
-│       │                           │   └── 2
-│       │                           └── value
-│       │                               └── dec
-│       └── [called_binary]([1, 2]) : Line 8
-│           └── expression
-│               └── [called_binary]([1, 2])
-│                   ├── path
-│                   │   └── [called_binary]
-│                   └── callOrIndexer
-│                       ├── 1
-│                       │   ├── 1
-│                       │   │   └── literal
-│                       │   │       ├── type
-│                       │   │       │   └── 1
-│                       │   │       └── value
-│                       │   │           └── dec
-│                       │   └── 2
-│                       │       └── literal
-│                       │           ├── type
-│                       │           │   └── 2
-│                       │           └── value
-│                       │               └── dec
-│                       └── 2
-│                           ├── 1
-│                           │   └── literal
-│                           │       ├── type
-│                           │       │   └── 1
-│                           │       └── value
-│                           │           └── dec
-│                           └── 2
-│                               └── literal
-│                                   ├── type
-│                                   │   └── 2
-│                                   └── value
-│                                       └── dec
-├── ../input/test_int.py/called_binary : Line 11
-│   ├── funcSignature : Line 0
-│   │   ├── identifier
-│   │   │   └── called_binary
-│   │   ├── argDefs
-│   │   │   ├── a as int : 11
-│   │   │   │   ├── typeRef
-│   │   │   │   │   └── int : 11
-│   │   │   │   └── identifier
-│   │   │   │       └── a
-│   │   │   └── b as int : 11
-│   │   │       ├── typeRef
-│   │   │       │   └── int : 11
-│   │   │       └── identifier
-│   │   │           └── b
-│   │   └── typeRef
-│   │       ├── a as int : 11
-│   │       │   ├── typeRef
-│   │       │   │   └── int : 11
-│   │       │   └── identifier
-│   │       │       └── a
-│   │       └── b as int : 11
-│   │           ├── typeRef
-│   │           │   └── int : 11
-│   │           └── identifier
-│   │               └── b
-│   └── statements
-│       ├── dim [a] as type int : 12 : Line 12
-│       │   └── dim
-│       │       ├── names
-│       │       │   └── [a]
-│       │       └── type
-│       │           └── int : 12
-│       ├── [a] = 7 : Line 13
-│       │   └── assignment
-│       │       ├── identifiers
-│       │       │   └── [a]
-│       │       └── value
-│       │           └── 7
-│       │               └── literal
-│       │                   ├── type
-│       │                   │   └── 7
-│       │                   └── value
-│       │                       └── dec
-│       ├── while : Line 14
-│       │   ├── while
-│       │   │   └── a > 5
-│       │   │       └── >
-│       │   │           ├── a
-│       │   │           └── 5
-│       │   │               └── literal
-│       │   │                   ├── type
-│       │   │                   │   └── 5
-│       │   │                   └── value
-│       │   │                       └── dec
-│       │   └── do
-│       │       └── [a] = a - 1 : Line 15
-│       │           └── assignment
-│       │               ├── identifiers
-│       │               │   └── [a]
-│       │               └── value
-│       │                   └── a - 1
-│       │                       └── -
-│       │                           ├── a
-│       │                           └── 1
-│       │                               └── literal
-│       │                                   ├── type
-│       │                                   │   └── 1
-│       │                                   └── value
-│       │                                       └── dec
-│       └── [print]([a, b]) : Line 17
-│           └── expression
-│               └── [print]([a, b])
-│                   ├── path
-│                   │   └── [print]
-│                   └── callOrIndexer
-│                       ├── a
-│                       │   ├── a
-│                       │   └── b
-│                       └── b
-│                           ├── a
-│                           └── b
-└── ../input/test_int.py/called_binary2 : Line 20
+└── ../input/test_int.py/main : Line 4
     ├── funcSignature : Line 0
     │   ├── identifier
-    │   │   └── called_binary2
-    │   ├── argDefs
-    │   │   ├── a as bool : 20
-    │   │   │   ├── typeRef
-    │   │   │   │   └── bool : 20
-    │   │   │   └── identifier
-    │   │   │       └── a
-    │   │   └── b as bool : 20
-    │   │       ├── typeRef
-    │   │       │   └── bool : 20
-    │   │       └── identifier
-    │   │           └── b
-    │   └── typeRef
-    │       ├── a as bool : 20
-    │       │   ├── typeRef
-    │       │   │   └── bool : 20
-    │       │   └── identifier
-    │       │       └── a
-    │       └── b as bool : 20
-    │           ├── typeRef
-    │           │   └── bool : 20
-    │           └── identifier
-    │               └── b
+    │   │   └── main
+    │   └── argDefs
     └── statements
-        ├── if : Line 21
+        ├── dim [a] as type int : 5 : Line 5
+        │   └── dim
+        │       ├── names
+        │       │   └── [a]
+        │       └── type
+        │           └── int : 5
+        ├── [a] = (0 + a) + (2 + (5 + 6)) + a + (2 + (5 + 6)) + a : Line 6
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [a]
+        │       └── value
+        │           └── (0 + a) + (2 + (5 + 6)) + a + (2 + (5 + 6)) + a
+        │               └── +
+        │                   ├── (0 + a) + (2 + (5 + 6)) + a + (2 + (5 + 6))
+        │                   │   └── +
+        │                   │       ├── (0 + a) + (2 + (5 + 6)) + a
+        │                   │       │   └── +
+        │                   │       │       ├── (0 + a) + (2 + (5 + 6))
+        │                   │       │       │   └── +
+        │                   │       │       │       ├── (0 + a)
+        │                   │       │       │       │   └── braces
+        │                   │       │       │       │       └── 0 + a
+        │                   │       │       │       │           └── +
+        │                   │       │       │       │               ├── 0
+        │                   │       │       │       │               │   └── literal
+        │                   │       │       │       │               │       ├── type
+        │                   │       │       │       │               │       │   └── 0
+        │                   │       │       │       │               │       └── value
+        │                   │       │       │       │               │           └── dec
+        │                   │       │       │       │               └── a
+        │                   │       │       │       └── (2 + (5 + 6))
+        │                   │       │       │           └── braces
+        │                   │       │       │               └── 2 + (5 + 6)
+        │                   │       │       │                   └── +
+        │                   │       │       │                       ├── 2
+        │                   │       │       │                       │   └── literal
+        │                   │       │       │                       │       ├── type
+        │                   │       │       │                       │       │   └── 2
+        │                   │       │       │                       │       └── value
+        │                   │       │       │                       │           └── dec
+        │                   │       │       │                       └── (5 + 6)
+        │                   │       │       │                           └── braces
+        │                   │       │       │                               └── 5 + 6
+        │                   │       │       │                                   └── +
+        │                   │       │       │                                       ├── 5
+        │                   │       │       │                                       │   └── literal
+        │                   │       │       │                                       │       ├── type
+        │                   │       │       │                                       │       │   └── 5
+        │                   │       │       │                                       │       └── value
+        │                   │       │       │                                       │           └── dec
+        │                   │       │       │                                       └── 6
+        │                   │       │       │                                           └── literal
+        │                   │       │       │                                               ├── type
+        │                   │       │       │                                               │   └── 6
+        │                   │       │       │                                               └── value
+        │                   │       │       │                                                   └── dec
+        │                   │       │       └── a
+        │                   │       └── (2 + (5 + 6))
+        │                   │           └── braces
+        │                   │               └── 2 + (5 + 6)
+        │                   │                   └── +
+        │                   │                       ├── 2
+        │                   │                       │   └── literal
+        │                   │                       │       ├── type
+        │                   │                       │       │   └── 2
+        │                   │                       │       └── value
+        │                   │                       │           └── dec
+        │                   │                       └── (5 + 6)
+        │                   │                           └── braces
+        │                   │                               └── 5 + 6
+        │                   │                                   └── +
+        │                   │                                       ├── 5
+        │                   │                                       │   └── literal
+        │                   │                                       │       ├── type
+        │                   │                                       │       │   └── 5
+        │                   │                                       │       └── value
+        │                   │                                       │           └── dec
+        │                   │                                       └── 6
+        │                   │                                           └── literal
+        │                   │                                               ├── type
+        │                   │                                               │   └── 6
+        │                   │                                               └── value
+        │                   │                                                   └── dec
+        │                   └── a
+        ├── dim [a] as type bool : 7 : Line 7
+        │   └── dim
+        │       ├── names
+        │       │   └── [a]
+        │       └── type
+        │           └── bool : 7
+        ├── [a] = 5 > 3 + 3 : Line 8
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [a]
+        │       └── value
+        │           └── 5 > 3 + 3
+        │               └── >
+        │                   ├── 5
+        │                   │   └── literal
+        │                   │       ├── type
+        │                   │       │   └── 5
+        │                   │       └── value
+        │                   │           └── dec
+        │                   └── 3 + 3
+        │                       └── +
+        │                           ├── 3
+        │                           │   └── literal
+        │                           │       ├── type
+        │                           │       │   └── 3
+        │                           │       └── value
+        │                           │           └── dec
+        │                           └── 3
+        │                               └── literal
+        │                                   ├── type
+        │                                   │   └── 3
+        │                                   └── value
+        │                                       └── dec
+        ├── [a] = (5 > 3) and (false or true) : Line 9
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [a]
+        │       └── value
+        │           └── (5 > 3) and (false or true)
+        │               └── and
+        │                   ├── (5 > 3)
+        │                   │   └── braces
+        │                   │       └── 5 > 3
+        │                   │           └── >
+        │                   │               ├── 5
+        │                   │               │   └── literal
+        │                   │               │       ├── type
+        │                   │               │       │   └── 5
+        │                   │               │       └── value
+        │                   │               │           └── dec
+        │                   │               └── 3
+        │                   │                   └── literal
+        │                   │                       ├── type
+        │                   │                       │   └── 3
+        │                   │                       └── value
+        │                   │                           └── dec
+        │                   └── (false or true)
+        │                       └── braces
+        │                           └── false or true
+        │                               └── or
+        │                                   ├── false
+        │                                   │   └── literal
+        │                                   │       ├── type
+        │                                   │       │   └── false
+        │                                   │       └── value
+        │                                   │           └── bool
+        │                                   └── true
+        │                                       └── literal
+        │                                           ├── type
+        │                                           │   └── true
+        │                                           └── value
+        │                                               └── bool
+        ├── dim [b] as type int : 11 : Line 11
+        │   └── dim
+        │       ├── names
+        │       │   └── [b]
+        │       └── type
+        │           └── int : 11
+        ├── dim [c] as type bool : 12 : Line 12
+        │   └── dim
+        │       ├── names
+        │       │   └── [c]
+        │       └── type
+        │           └── bool : 12
+        ├── if : Line 14
         │   ├── if
-        │   │   └── false
-        │   │       └── literal
-        │   │           ├── type
-        │   │           │   └── false
-        │   │           └── value
-        │   │               └── bool
-        │   ├── then
-        │   │   └── if : Line 22
-        │   │       ├── if
-        │   │       │   └── true
-        │   │       │       └── literal
-        │   │       │           ├── type
-        │   │       │           │   └── true
-        │   │       │           └── value
-        │   │       │               └── bool
-        │   │       └── then
-        │   │           ├── dim [a] as type bool : 23 : Line 23
-        │   │           │   └── dim
-        │   │           │       ├── names
-        │   │           │       │   └── [a]
-        │   │           │       └── type
-        │   │           │           └── bool : 23
-        │   │           └── [a] = false : Line 24
-        │   │               └── assignment
-        │   │                   ├── identifiers
-        │   │                   │   └── [a]
-        │   │                   └── value
-        │   │                       └── false
-        │   │                           └── literal
-        │   │                               ├── type
-        │   │                               │   └── false
-        │   │                               └── value
-        │   │                                   └── bool
-        │   └── else
-        │       ├── dim [a] as type string : 27 : Line 27
+        │   │   └── c
+        │   └── then
+        │       ├── [a] = false : Line 15
+        │       │   └── assignment
+        │       │       ├── identifiers
+        │       │       │   └── [a]
+        │       │       └── value
+        │       │           └── false
+        │       │               └── literal
+        │       │                   ├── type
+        │       │                   │   └── false
+        │       │                   └── value
+        │       │                       └── bool
+        │       ├── dim [a] as type int : 16 : Line 16
         │       │   └── dim
         │       │       ├── names
         │       │       │   └── [a]
         │       │       └── type
-        │       │           └── string : 27
-        │       └── [a] = test : Line 28
+        │       │           └── int : 16
+        │       └── [a] = 111 : Line 17
         │           └── assignment
         │               ├── identifiers
         │               │   └── [a]
         │               └── value
-        │                   └── test
+        │                   └── 111
         │                       └── literal
         │                           ├── type
-        │                           │   └── test
+        │                           │   └── 111
         │                           └── value
-        │                               └── str
-        └── [called_binary]([2, 3]) : Line 77
-            └── expression
-                └── [called_binary]([2, 3])
-                    ├── path
-                    │   └── [called_binary]
-                    └── callOrIndexer
-                        ├── 2
-                        │   ├── 2
-                        │   │   └── literal
-                        │   │       ├── type
-                        │   │       │   └── 2
-                        │   │       └── value
-                        │   │           └── dec
-                        │   └── 3
-                        │       └── literal
-                        │           ├── type
-                        │           │   └── 3
-                        │           └── value
-                        │               └── dec
-                        └── 3
-                            ├── 2
-                            │   └── literal
-                            │       ├── type
-                            │       │   └── 2
-                            │       └── value
-                            │           └── dec
-                            └── 3
-                                └── literal
-                                    ├── type
-                                    │   └── 3
-                                    └── value
-                                        └── dec
+        │                               └── dec
+        └── [a] = false : Line 19
+            └── assignment
+                ├── identifiers
+                │   └── [a]
+                └── value
+                    └── false
+                        └── literal
+                            ├── type
+                            │   └── false
+                            └── value
+                                └── bool

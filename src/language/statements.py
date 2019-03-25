@@ -1,3 +1,4 @@
+from expr_coder import ExprCoder
 from node import NodeValue
 
 
@@ -26,13 +27,12 @@ class If(Statements):
         then_byte = []
         for stmt in self.then_stmt:
             then_byte += stmt.byte_code()
-        expr_byte = self.expr.byte_code()
+        expr_byte = ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()
 
         then_jump = str(len(then_byte) + 4) if self.else_stmt else str(len(then_byte) + 3)
 
         stmt_stack += ['IF',
                        *expr_byte,
-                       'ENDEXPR',
                        'JUMP ' + then_jump]
         stmt_stack += ['BLOCK', *then_byte]
 
@@ -65,18 +65,18 @@ class While(Statements):
             do_byte += stmt.byte_code()
 
         if self.loop_type == 'until':
+            loop_byte = ExprCoder([*loop_byte, 'ENDEXPR']).expr_executor()
             stmt_stack += ['LOOP',
                            *do_byte,
                            'IF',
                            *loop_byte,
-                           'ENDEXPR',
                            'JUMP -' + str(len(do_byte) + len(do_byte) + 3),
                            'ENDLOOP']
         else:
+            loop_byte = ExprCoder([*loop_byte, 'ENDEXPR']).expr_executor()
             stmt_stack += ['LOOP',
                            'IF',
                            *loop_byte,
-                           'ENDEXPR',
                            'JUMP ' + str(len(do_byte) + 2),
                            *do_byte,
                            'JUMP -' + str(len(loop_byte) + len(do_byte) + 3),
@@ -109,7 +109,7 @@ class Assignment(Statements):
     def byte_code(self):
         stmt_stack = []
         for id in self.identifiers:
-            stmt_stack += ['ASSIGN', *id.byte_code(), *self.expr.byte_code(), 'ENDEXPR']
+            stmt_stack += ['ASSIGN', *id.byte_code(), *ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()]
         return stmt_stack
 
 

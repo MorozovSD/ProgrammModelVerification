@@ -3,21 +3,21 @@
 #
 function main()
 dim a as int
-a = 1 + (2 +(3 + (4 + (5 + 6 )))) + 7 + 8 + 9;
-# dim a as bool
-# a = 5 > 3 + 3;
-# a = (5 > 3) and (false or true);
-#
-# dim b as int
-# dim c as bool
-# # 2 + 4 + a + '3';
-# if c then
-#     a = false;
-#     dim a as int
-#     a = 111;
-# end if
-# a = false;
-#
+a = (0 + a) + (2 +(5 + 6 ))+ a + (2 +(5 + 6 ))+ a;
+dim a as bool
+a = 5 > 3 + 3;
+a = (5 > 3) and (false or true);
+
+dim b as int
+dim c as bool
+# 2 + 4 + a + '3';
+if c then
+    a = false;
+    dim a as int
+    a = 111;
+end if
+a = false;
+
 # dim c as int
 # c = 1;
 # while c > 5

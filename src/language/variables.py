@@ -42,7 +42,7 @@ class Identifier(NodeValue):
         return str(self.name)
 
     def byte_code(self):
-        return ['DIM ' + self.name]
+        return ['VAR ' + self.type.upper() + ' ' + self.name]
 
     def expr_check(self, context, expr_type=None):
         if self.name not in context.keys():
