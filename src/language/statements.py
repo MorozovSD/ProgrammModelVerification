@@ -130,5 +130,5 @@ class Declaration(Statements):
     def byte_code(self):
         stmt_stack = []
         for id in self.identifiers:
-            stmt_stack += ['DIM', *id.byte_code(), *self.type.byte_code()]
+            stmt_stack += ['DIM', *id.byte_code()]
         return stmt_stack

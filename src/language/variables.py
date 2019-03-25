@@ -1,3 +1,5 @@
+from Exeptions import VariableTypeException, UnknownVariableException
+from language.expressions import type_comparison, type_conversion
 from node import NodeValue
 
 
@@ -11,7 +13,14 @@ class Literal(NodeValue):
         return str(self.value)
 
     def byte_code(self):
-        return [self.type.upper(), self.value]
+        return [self.type.upper() + ' ' + self.value]
+
+    def get_type(self, context):
+        return [self.type]
+
+    def expr_check(self, context, expr_type=None):
+        if expr_type and not type_comparison([self.type], type_conversion[expr_type]):
+            raise VariableTypeException(expected=type_conversion[expr_type], actual=[self.type], pos=self.pos)
 
 
 class Identifier(NodeValue):
@@ -25,11 +34,22 @@ class Identifier(NodeValue):
         self.type = type
         return self
 
+    def get_type(self, context):
+        self.type = context[self.name].type
+        return [self.type]
+
     def __repr__(self):
         return str(self.name)
 
     def byte_code(self):
-        return ['VAR ' + self.name]
+        return ['DIM ' + self.name]
+
+    def expr_check(self, context, expr_type=None):
+        if self.name not in context.keys():
+            raise UnknownVariableException(variable=self.name, pos=self.pos)
+        self.type = context[self.name].type
+        if expr_type and not type_comparison([self.type], type_conversion[expr_type]):
+            raise VariableTypeException(expected=type_conversion[expr_type], actual=[self.type], pos=self.pos)
 
 
 class Argument(NodeValue):
@@ -59,3 +79,6 @@ class Array(NodeValue):
 
     def byte_code(self):
         return ['ARRAY', str(self.len), *self.type.byte_code()]
+
+    def get_type(self, context):
+        return [self.type]

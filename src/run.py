@@ -6,6 +6,9 @@ from graph_flow import Graph, GraphFlow
 from interpreter import Interpreter
 from syntax_tree_parser import parse_tokens
 
+reg = {'regi': [None, None, None],
+       'regs': [None, None, None],
+       'regb': [None, None, None]}
 
 def usage():
     print("""Run example:
@@ -51,6 +54,7 @@ def main():
     func_usage = {'CurrentlyUnknown': []}
     byte_code = []
     byte_code_func = {}
+    context = {}
     for file in input:
         file_name = file.split('/')[-1][:-4]
         ast = parse_tokens(file)
@@ -99,16 +103,16 @@ def main():
         for call in filter(None, _calls):
             for func in functions:
                 if str(call.path[0]) == str(func.signature.name):
-                    try:
+                    # try:
                         # if not call.call_func:
                         call.call_func = func
                         if calls_path not in func_usage[func]:
                             func_usage[func].append(calls_path)
                         # else:
                         #     raise FunctionSourceException()
-                    except FunctionSourceException as e:
-                        print(e.message % (call.path[0], calls_path, call.call_func))
-                        exit(3)
+                    # except FunctionSourceException as e:
+                    #     print(e.message % (call.path[0], calls_path, call.call_func))
+                    #     exit(3)
                 # else:
                     # func_usage[call.uniq_str()] = []
                     # if call.call_func == 'CurrentlyUnknown' and calls_path not in func_usage[call.uniq_str()]:
@@ -124,8 +128,9 @@ def main():
         f.write('ENDCONTEXT\n'.encode())
         for i, line in enumerate(byte_code):
             f.write((line + '\n').encode())
-    interpreter = Interpreter(output + 'linear_code.bin')
-    interpreter.start_execute()
+    # interpreter = Interpreter(output + 'linear_code.bin')
+    # interpreter.start_execute()
+
 
 def inverse_mapping(f):
     inv_map = {}

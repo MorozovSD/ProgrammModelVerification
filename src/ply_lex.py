@@ -68,7 +68,7 @@ tokens = (
     'LONG',
     'ULONG',
     'CHAR',
-    'STR',
+    'STRING',
     # Имена переменных
     'IDENTIFIER',
     'ILLEGAL_TYPE'
@@ -139,7 +139,7 @@ t_RBRACES = r'\)'
 t_SQR_LBRACES = r'\['
 t_SQR_RBRACES = r'\]'
 
-t_STR = r'"[^\"\\]*(?:\\.[^\"\\]*)*\"'
+t_STRING = r'"[^\"\\]*(?:\\.[^\"\\]*)*\"'
 t_CHAR = r'\'[^\']\''
 
 

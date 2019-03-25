@@ -190,9 +190,9 @@ def p_identifiers(p):
         p[0] = add_to_list(p[0], p[3])
 
 
-def p_indexes(p):
-    """indexes : index COMMA indexes
-               | index"""
+def p_callOrIndexers(p):
+    """callOrIndexers : callOrIndexer COMMA callOrIndexers
+                      | callOrIndexer"""
     if len(p) == 2:
         p[0] = []
         p[0] = add_to_list(p[0], p[1])
@@ -299,7 +299,6 @@ def p_expr(p):
             | unary
             | braces
             | callOrIndexer
-            | index
             | place
             | literal
     """
@@ -321,7 +320,7 @@ def p_binary(p):
               | expr OR expr
     """
     binary = NodeValue(role=p[2], children=[p[1], p[3]])
-    p[0] = BinaryExpression(left=p[1], right=p[3], operand=p[2], children=[binary])
+    p[0] = BinaryExpression(left=p[1], right=p[3], operand=p[2], pos=p[1].pos, children=[binary])
 
 
 def p_unary(p):
@@ -329,12 +328,12 @@ def p_unary(p):
              | MINUS expr %prec UMINUS
     """
     unary = NodeValue(role=p[1], children=[p[2]])
-    p[0] = UnaryExpression(expr=p[2], operand=p[1], children=[unary])
+    p[0] = UnaryExpression(expr=p[2], operand=p[1], pos=p[1].pos, children=[unary])
 
 
 def p_assignment(p):
     """assignment : identifiers ASSIGNMENT expr
-                  | indexes ASSIGNMENT expr
+                  | callOrIndexers ASSIGNMENT expr
     """
     identifiers = NodeValue(role='identifiers', children=[NodeValue(role=str(p[1]))])
     value = NodeValue(role='value', children=[p[3]])
@@ -372,12 +371,12 @@ def p_path(p):
         p[0] = add_to_list(p[0], p[3])
 
 
-def p_index(p):
-    """index :  identifier SQR_LBRACES expr SQR_RBRACES
-    """
-    name = NodeValue('ListName', children=[p[1]])
-    index = NodeValue('Index', children=[p[3]])
-    p[0] = Index(name=p[1], index=p[3], pos=set_pos(p, 1), children=[name, index])
+# def p_index(p):
+#     """index :  identifier SQR_LBRACES expr SQR_RBRACES
+#     """
+#     name = NodeValue('ListName', children=[p[1]])
+#     index = NodeValue('Index', children=[p[3]])
+#     p[0] = Index(name=p[1], index=p[3], pos=set_pos(p, 1), children=[name, index])
 
 
 def p_place(p):
@@ -399,8 +398,8 @@ def p_literal(p):
 
 
 def p_str(p):
-    """str : STR"""
-    p[0] = p[1].replace('"', ''), p.slice[0].type, set_pos(p, 1)
+    """str : STRING"""
+    p[0] = p[1].replace('"', ''), 'string', set_pos(p, 1)
 
 
 def p_char(p):

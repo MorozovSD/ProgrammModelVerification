@@ -72,9 +72,9 @@ integer = {'DEC': 10,
 
 reversed_func = ['return', 'print']
 
-string = ['STR', 'CHAR']
+string = ['string', 'CHAR']
 boolean = ['BOOL']
-_type = {str(str): 'str',
+_type = {str(str): 'string',
          str(bool): 'bool',
          str(int): 'int'}
 
@@ -103,9 +103,10 @@ class Interpreter:
         while self.current()[0] not in ['ENDCONTEXT', '']:
             param = self.current()[1] if self.current()[1] else ''
             if not self.context['variable'].get(self.current()[0]):
-                self.context['variable'][self.current()[0]] = [None, {}]
+                self.context['variable'][self.current()[0]] = [None, None, {}]
             self.context['variable'][self.current()[0]][0] = self.current()[0]
-            self.context['variable'][self.current()[0]][1][param] = int(self.current()[2]) + end_context + 1
+            self.context['variable'][self.current()[0]][1] = 'function'
+            self.context['variable'][self.current()[0]][2][param] = int(self.current()[2]) + end_context + 1
             self.next()
 
     def return_func(self, param):
@@ -168,7 +169,7 @@ class Interpreter:
             for arg in filter(None, args):
                 _args += _type[str(type(arg))] + '_'
             _args = _args[:-1]
-        return self.context['variable'][name][1][_args]
+        return self.context['variable'][name][2][_args]
 
     def start_execute(self, context=None):
         self.context['stack_trace'].append(self.current()[1])
@@ -179,6 +180,7 @@ class Interpreter:
         # print(context)
         while self.current()[0] not in ['EFUNC', 'ENDBLOCK', 'ENDLOOP', '']:
             print(self)
+            print(self.stack)
             # print(context)
             if self.current()[0] == 'EXPR':
                 self.expr_executor(context=context)
@@ -196,28 +198,25 @@ class Interpreter:
 
                 assigment = self.next()
 
-                if assigment[0] == 'INDEX':
-                    name = self.next()[1]
-                    # print(self.current())
+                if assigment[0] == 'CALL':
                     self.expr_executor(context=context)
-                    index = int(self.stack.pop())
-                    variable = context['variable'][name][0][index - 1]
-                    self.check_context(name, 'variable', context)
-                    self.expr_executor(context=context)
-                    value = self.stack.pop()
+                    value = self.stack.pop()[0]
+                    variable, _type, name, index = self.stack.pop()
 
-                    self.check_type(variable, value)
-                    context['variable'][name][0][index - 1] = (value, variable[1])
+                    self.check_type((variable, _type), value)
+                    context['variable'][name][2][index] = (value, _type)
+                    print(context['variable'][name])
                 else:
                     name = assigment[1]
                     variable = context['variable'][name]
 
                     self.check_context(name, 'variable', context)
                     self.expr_executor(context=context)
-                    value = self.stack.pop()
+                    value = self.stack.pop()[0]
 
                     self.check_type(variable, value)
                     context['variable'][name] = (value, variable[1])
+                    print(context['variable'][name])
 
                 self.next()
                 continue
@@ -225,7 +224,7 @@ class Interpreter:
             if self.current()[0] == 'IF':
                 self.next()
                 self.expr_executor(context=context)
-                if self.stack.pop():
+                if self.stack.pop()[0]:
                     self.next()
                 self.next()
                 continue
@@ -265,31 +264,31 @@ class Interpreter:
             print('\t' + str(self))
             # print('\t' + str(expr_stack))
             if self.current()[0] in bin_ops.keys():
-                right = expr_stack.pop()
-                left = expr_stack.pop()
+                right = expr_stack.pop()[0]
+                left = expr_stack.pop()[0]
                 if type(left) == int:
-                    expr_stack.append(bin_ops_int[self.current()[0]](left, int(right)))
+                    expr_stack.append([bin_ops_int[self.current()[0]](left, int(right))])
                     self.next()
                     continue
                 if type(left) == str:
-                    expr_stack.append(bin_ops_str[self.current()[0]](left, str(right)))
+                    expr_stack.append([bin_ops_str[self.current()[0]](left, str(right))])
                     self.next()
                     continue
                 if type(left) == bool:
-                    expr_stack.append(bin_ops_bool[self.current()[0]](left, bool(right)))
+                    expr_stack.append([bin_ops_bool[self.current()[0]](left, bool(right))])
                     self.next()
                     continue
                 print('Unsupported binary operand %s for %s' % (bin_ops[self.current()[0]], type(left)))
                 exit(6)
 
             if self.current()[0] in un_ops.keys():
-                left = expr_stack.pop()
+                left = expr_stack.pop()[0]
                 if type(left) == int:
-                    expr_stack.append(un_ops_int[self.current()[0]](left))
+                    expr_stack.append([un_ops_int[self.current()[0]](left)])
                     self.next()
                     continue
                 if type(left) == bool:
-                    expr_stack.append(un_ops_bool[self.current()[0]](left))
+                    expr_stack.append([un_ops_bool[self.current()[0]](left)])
                     self.next()
                     continue
                 print('Unsupported unary operand %s for %s' % (un_ops[self.current()[0]], type(left)))
@@ -298,43 +297,43 @@ class Interpreter:
             if self.current()[0] in integer.keys():
                 _type = self.current()[0]
                 value = self.next()[0]
-                expr_stack.append(int(value, base=integer[_type]))
+                expr_stack.append([int(value, base=integer[_type])])
                 self.next()
                 continue
 
             if self.current()[0] in string:
                 value = self.next()[0]
-                expr_stack.append(str(value))
+                expr_stack.append([str(value)])
                 self.next()
                 continue
 
             if self.current()[0] in boolean:
                 value = self.next()[0]
-                expr_stack.append(bool(value))
+                expr_stack.append([bool(value)])
                 self.next()
                 continue
 
             if self.current()[0] == 'VAR':
                 name = self.current()[1]
-                if name in reversed_func:
-                    expr_stack.append(name)
-                    self.next()
-                    continue
+                # if name in reversed_func:
+                #     expr_stack.append([name])
+                #     self.next()
+                #     continue
                 value = context['variable'][name][0]
                 if value:
                     expr_stack.append(value)
                 self.next()
                 continue
 
-            if self.current()[0] == 'INDEX':
-                name = self.next()[1]
-                # print(self.current())
-                self.expr_executor(context=context)
-                index = int(self.stack.pop())
-                value = context['variable'][name][0][index - 1][0]
-                expr_stack.append(value)
-                self.next()
-                continue
+            # if self.current()[0] == 'INDEX':
+            #     name = self.next()[1]
+            #     print(self.current())
+                # self.expr_executor(context=context)
+                # index = int(self.stack.pop())
+                # value = context['variable'][name][0][index - 1][0]
+                # expr_stack.append([value])
+                # self.next()
+                # continue
 
             if self.current()[0] == 'CALL':
                 self.next()
@@ -345,19 +344,37 @@ class Interpreter:
                 self.next()
                 while self.current()[0] != 'ENDPARAM':
                     self.expr_executor(context=context)
-                    params.append(self.stack[-1])
+                    params.append(self.stack.pop()[0])
                     self.next()
-                current_indeex = self.index
-                if name in reversed_func:
-                    self.call_rezerved(name, params)
-                else:
+                current_index = self.index
+
+                if context['variable'][name][1] == 'function':
                     self.index = self.find_func(name, params)
                     func_context = deepcopy(self.context)
                     self.start_execute(func_context)
                     # expr_stack.append(self.stack.pop())
-                    self.index = current_indeex
+                    self.index = current_index
                     self.context['stack_trace'].pop()
-                self.next()
+                    self.next()
+
+                if context['variable'][name][1] == list:
+                    index = 1
+                    name, _type, value, array_n = context['variable'][name]
+                    out_of_index = False
+                    if len(params) != len(array_n):
+                        print('Array is %s-dimensional not %s' % (len(array_n), len(params)))
+                        exit(5)
+                    for line, length in params, array_n:
+                        if index > length:
+                            print('Out of index error %s index %s<%s ' % (context['variable'][name][0],
+                                                                           context['variable'][name][3], len))
+                            exit(5)
+                        else:
+                            index += (line - 1) * length
+
+                    expr_stack.append((*context['variable'][name][2][index], name, index))
+                    # print(expr_stack)
+                    self.next()
                 continue
 
             if self.current()[0] == 'POP':
@@ -377,7 +394,7 @@ class Interpreter:
             exit(5)
 
     def dim_executer(self, context):
-        dim_stack = [None]
+        dim_stack = []
         name = ''
         while self.next():
             if self.current()[0] == 'VAR':
@@ -390,13 +407,23 @@ class Interpreter:
 
             if self.current()[0] in type_mapper.keys():
                 _type = type_mapper[self.current()[0]]
-                array = dim_stack.pop()
-                if array:
-                    context['variable'][name] = ([[None, _type] for _ in range(array)], list)
+                array = deepcopy(dim_stack)
+                len = 1
+                while dim_stack:
+                    len *= dim_stack.pop()
+                if len:
+                    context['variable'][name] = (name, list, [[None, _type] for _ in range(len)], array)
                 else:
                     context['variable'][name] = (None, _type)
-
+                print(context)
                 return
+
+    def get_index(self, _len, pos, max):
+        index = 0
+        for line, length in zip(pos, max):
+            index += int(_len / length) * (line - 1)
+
+
 
 
 # def usage():

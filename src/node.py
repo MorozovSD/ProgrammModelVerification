@@ -1,6 +1,8 @@
 from anytree import Node as TreeNode, RenderTree
 from anytree.exporter import DotExporter
 
+from Exeptions import VariableTypeException, UnknownVariableException, NotImplementedYetExeption
+
 
 class Node:
     def __repr__(self):
@@ -71,6 +73,9 @@ class NodeValue(Node):
                     list += [child]
         return list
 
+    def get_type(self, context):
+        raise NotImplementedYetExeption(func='get_type', node=self)
+
     def recursive_get(self, _type):
         list = []
         if type(self) == _type:
@@ -79,6 +84,31 @@ class NodeValue(Node):
             for child in self.children:
                 list += child.recursive_get(_type)
         return list
+
+    # def expr_check_type(self, context, expr_type=None):
+    #     from language import Identifier, Literal
+    #     # literals_in_expr = self.recursive_get(Literal)
+    #     # for literal in literals_in_expr:
+    #     #     expr_type = expr_type if expr_type else literal.type
+    #     #     if literal.type not in self.type_conversion[expr_type]:
+    #     #         raise VariableTypeException(expected=self.type_conversion[expr_type], actual=literal.type, pos=literal.pos)
+    #     variables_in_expr = self.recursive_get(Identifier)
+    #     for var in variables_in_expr:
+    #         if var.name in context.keys():
+    #             var_type = context[var.name][1]
+    #             # expr_type = expr_type if expr_type else var_type
+    #             # if var_type not in self.type_conversion[expr_type]:
+    #             #     raise VariableTypeException(expected=self.type_conversion[expr_type], actual=var_type, pos=var.pos)
+    #         else:
+    #             raise UnknownVariableException(variable=var, pos=var.pos)
+    #
+    # # def check_valid_type(self, expr_type=None):
+    # #     from language import Literal
+    # #     literals_in_expr = self.recursive_get(Literal)
+    # #     for literal in literals_in_expr:
+    # #         expr_type = expr_type if expr_type else literal.type
+    # #         if literal.type not in self.type_conversion[expr_type]:
+    # #             raise VariableTypeException(expected=expr_type, actual=literal.type, pos=literal.pos)
 
     def uniq_str(self):
         return str(self) + ' (id: ' + self.id + ')'
