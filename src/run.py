@@ -128,8 +128,9 @@ def main():
         f.write('ENDCONTEXT\n'.encode())
         for i, line in enumerate(byte_code):
             f.write((line + '\n').encode())
-    # interpreter = Interpreter(output + 'linear_code.bin')
-    # interpreter.start_execute()
+    interpreter = Interpreter(output + 'linear_code.bin')
+    interpreter.start_execute()
+
 
 
 def inverse_mapping(f):

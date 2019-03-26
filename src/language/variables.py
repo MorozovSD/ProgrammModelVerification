@@ -19,7 +19,10 @@ class Literal(NodeValue):
         return [self.type]
 
     def expr_check(self, context, expr_type=None):
-        if expr_type and not type_comparison([self.type], type_conversion[expr_type]):
+        if self.type[:5] == 'ARRAY' or expr_type[:5] == 'ARRAY':
+            if expr_type[:5] != self.type[:5]:
+                raise VariableTypeException(expected=expr_type, actual=[self.type], pos=self.pos)
+        elif expr_type and not type_comparison([self.type], type_conversion[expr_type]):
             raise VariableTypeException(expected=type_conversion[expr_type], actual=[self.type], pos=self.pos)
 
 
@@ -62,7 +65,8 @@ class Argument(NodeValue):
         return str(self.identifier.name) + ' as ' + str(self.expected_type)
 
     def byte_code_dim(self):
-        return ['DIM', *self.identifier.byte_code(), *self.expected_type.byte_code()]
+        self.identifier.type = self.expected_type.role
+        return ['DIM', *self.identifier.byte_code()]
 
     def byte_code_assign(self):
         return ['ASSIGN', *self.identifier.byte_code(), 'POP', 'ENDEXPR']
@@ -73,12 +77,14 @@ class Array(NodeValue):
         super().__init__(children=children)
         self.type = type
         self.len = len
+        self.role = 'ARRAY ' + str(len)
 
     def __repr__(self):
         return 'array of ' + str(self.type)
 
     def byte_code(self):
-        return ['ARRAY', str(self.len), *self.type.byte_code()]
+        return [str(self.len), *self.type.byte_code()]
 
     def get_type(self, context):
         return [self.type]
+

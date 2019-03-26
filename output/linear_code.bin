@@ -3,13 +3,39 @@ main  0
 ENDCONTEXT
 FUNC main 
 DIM
-VAR BOOL a
+VAR STRING b
+DIM
+VAR STRING c
+DIM
+VAR STRING a
 ASSIGN
-VAR BOOL a
-LOAD #i1 5
-LOAD #i2 3
-LOAD #i3 3
-ADD #i2 #i3 #i4
-MORE #i1 #i4 #b1
-ENDEXPR
+VAR STRING a
+LOAD #s1 a
+ENDEXPR #out #s1
+ASSIGN
+VAR STRING b
+LOAD #s1 a
+ENDEXPR #out #s1
+ASSIGN
+VAR STRING c
+LOAD #s1 1
+ENDEXPR #out #s1
+DIM
+VAR ARRAY aa1
+5
+int
+ASSIGN
+LOAD #s1 aa1
+LOAD #i1 1
+CALL #out #s1 #i1
+ENDEXPR #out #out
+LOAD #i1 1
+ENDEXPR #out #i1
+ASSIGN
+LOAD #s1 aa1
+LOAD #i1 0
+CALL #out #s1 #i1
+ENDEXPR #out #out
+LOAD #i1 10
+ENDEXPR #out #i1
 EFUNC

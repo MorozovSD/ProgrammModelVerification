@@ -79,7 +79,7 @@ class While(Statements):
                            *loop_byte,
                            'JUMP ' + str(len(do_byte) + 2),
                            *do_byte,
-                           'JUMP -' + str(len(loop_byte) + len(do_byte) + 3),
+                           'JUMP -' + str(len(loop_byte) + len(do_byte) + 2),
                            'ENDLOOP']
         return stmt_stack
 
@@ -107,9 +107,13 @@ class Assignment(Statements):
         return str(self.identifiers) + ' = ' + str(self.expr) + ' (id: ' + self.id + ')'
 
     def byte_code(self):
+        from language import CallOrIndexer
         stmt_stack = []
         for id in self.identifiers:
-            stmt_stack += ['ASSIGN', *id.byte_code(), *ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()]
+            if type(id) == CallOrIndexer:
+                stmt_stack += ['ASSIGN', *ExprCoder([*id.byte_code(), 'ENDEXPR']).expr_executor(), *ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()]
+            else:
+                stmt_stack += ['ASSIGN', *id.byte_code(), *ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()]
         return stmt_stack
 
 
@@ -128,7 +132,12 @@ class Declaration(Statements):
         return self.statement_type + ' ' + str(self.identifiers) + ' as type ' + str(self.type) + ' (id: ' + self.id + ')'
 
     def byte_code(self):
+        from language import Array
         stmt_stack = []
         for id in self.identifiers:
-            stmt_stack += ['DIM', *id.byte_code()]
+            if type(self.type) == Array:
+                id.type = 'ARRAY'
+                stmt_stack += ['DIM', *id.byte_code(), *self.type.byte_code()]
+            else:
+                stmt_stack += ['DIM', *id.byte_code()]
         return stmt_stack

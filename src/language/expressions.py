@@ -88,7 +88,7 @@ class Expression(NodeValue):
         return str(self.expr) + ' (id: ' + self.id + ')'
 
     def byte_code(self):
-        return ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()
+        return ['EXPR', *ExprCoder([*self.expr.byte_code(), 'ENDEXPR']).expr_executor()]
 
     def check_idendifer(self, context):
         from language import Identifier
@@ -141,7 +141,7 @@ class BinaryExpression(Expression):
         self.left = left
         self.right = right
         self.operand = operand
-        self.type = None
+        self.type = 'Unknown'
 
     def get_type(self, context):
         left = self.left.get_type(context)
@@ -151,7 +151,10 @@ class BinaryExpression(Expression):
             if type_comparison(left, bin_ops_type.left) and type_comparison(right, bin_ops_type.right):
                 self.type = bin_ops_type.result[0]
                 return bin_ops_type.result
-        raise BinaryTypeException(left=left, right=right, operand=self.operand, pos=self.pos)
+        if left != ['CallOrIndexer'] and right != ['CallOrIndexer']:
+            raise BinaryTypeException(left=left, right=right, operand=self.operand, pos=self.pos)
+        else:
+            self.type = 'Unknown'
 
     def __repr__(self):
         return str(self.left) + ' ' + str(self.operand) + ' ' + str(self.right)
@@ -214,10 +217,14 @@ class CallOrIndexer(Expression):
         parameters = []
         path = []
         for p in self.path:
-            path += [*p.byte_code(), 'ENDEXPR']
+            p.type = 'STRING'
+            path += [*p.byte_code(), 'ENDNAME']
         for p in self.parameters:
-            parameters += [*p.byte_code(), 'ENDEXPR']
-        return ['CALL', *path, 'PARAM', *parameters, 'ENDPARAM']
+            parameters += [*p.byte_code(), 'ENDPARAM']
+        return ['CALL', *path, 'PARAM', *parameters, 'ENDPARAMS']
+
+    def get_type(self, context):
+        return ['CallOrIndexer']
 
 
 class ExternalVar(Expression):

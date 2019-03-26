@@ -63,7 +63,7 @@ class NodeValue(Node):
 
     def __repr__(self):
         pos = ' : ' + str(self.pos['line']) if self.pos else ''
-        return self.role + pos
+        return str(self.role) + str(pos)
 
     def get(self, _type):
         list = []

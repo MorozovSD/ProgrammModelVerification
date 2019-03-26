@@ -5,6 +5,31 @@ import os
 import ctypes
 from copy import deepcopy
 
+
+class Registry:
+    def __init__(self):
+        self.temp_var_id = 0
+        self.registry = {'#out': None,
+
+                         '#i1': None,
+                         '#i2': None,
+                         '#i3': None,
+                         '#i4': None,
+                         '#i5': None,
+
+                         '#s1': None,
+                         '#s2': None,
+                         '#s3': None,
+                         '#s4': None,
+                         '#s5': None,
+
+                         '#b1': None,
+                         '#b2': None,
+                         '#b3': None,
+                         '#b4': None,
+                         '#b5': None}
+
+
 bin_ops = {'ADD': operator.add,
            'MINUS': operator.sub,
            'DIVIDE': operator.truediv,
@@ -18,49 +43,49 @@ bin_ops = {'ADD': operator.add,
            'NOTEQ': operator.ne,
            'EQ': operator.eq}
 
-bin_ops_int = {'ADD': operator.add,
-               'MINUS': operator.sub,
-               'DIVIDE': operator.truediv,
-               'MUL': operator.mul,
-               'LESSEQ': operator.le,
-               'LESS': operator.lt,
-               'MOREEQ': operator.ge,
-               'MORE': operator.gt,
-               'NOTEQ': operator.ne,
-               'EQ': operator.eq}
-
-bin_ops_str = {'LESSEQ': operator.le,
-               'LESS': operator.lt,
-               'MOREEQ': operator.ge,
-               'MORE': operator.gt,
-               'ADD': operator.concat,
-               'NOTEQ': operator.ne,
-               'EQ': operator.eq}
-
-bin_ops_bool = {'AND': operator.and_,
-                'OR': operator.or_,
-                'LESSEQ': operator.le,
-                'LESS': operator.lt,
-                'MOREEQ': operator.ge,
-                'MORE': operator.gt,
-                'CONCAT': operator.concat,
-                'NOTEQ': operator.ne,
-                'EQ': operator.eq}
+# bin_ops_int = {'ADD': operator.add,
+#                'MINUS': operator.sub,
+#                'DIVIDE': operator.truediv,
+#                'MUL': operator.mul,
+#                'LESSEQ': operator.le,
+#                'LESS': operator.lt,
+#                'MOREEQ': operator.ge,
+#                'MORE': operator.gt,
+#                'NOTEQ': operator.ne,
+#                'EQ': operator.eq}
+#
+# bin_ops_str = {'LESSEQ': operator.le,
+#                'LESS': operator.lt,
+#                'MOREEQ': operator.ge,
+#                'MORE': operator.gt,
+#                'ADD': operator.concat,
+#                'NOTEQ': operator.ne,
+#                'EQ': operator.eq}
+#
+# bin_ops_bool = {'AND': operator.and_,
+#                 'OR': operator.or_,
+#                 'LESSEQ': operator.le,
+#                 'LESS': operator.lt,
+#                 'MOREEQ': operator.ge,
+#                 'MORE': operator.gt,
+#                 'CONCAT': operator.concat,
+#                 'NOTEQ': operator.ne,
+#                 'EQ': operator.eq}
 
 un_ops = {'UMINUS': operator.neg, 'NOT': operator.not_}
 un_ops_int = {'UMINUS': operator.neg}
 un_ops_bool = {'NOT': operator.not_}
 
-type_mapper = {'dec': int,
-               'hex': int,
-               'bits': int,
-               'int': int,
-               'uint': int,
-               'long': int,
-               'ulong': int,
-               'string': str,
-               'char': str,
-               'bool': bool}
+type_mapper = {'DEC': int,
+               'HEX': int,
+               'BITS': int,
+               'INT': int,
+               'UINT': int,
+               'LONG': int,
+               'ULONG': int,
+               'STRING': str,
+               'CHAR': str,
+               'BOOL': bool}
 
 integer = {'DEC': 10,
            'HEX': 16,
@@ -80,33 +105,36 @@ _type = {str(str): 'string',
 
 
 class Interpreter:
-    def call_rezerved(self, func, param):
-        if func == 'return':
-            self.return_func(param)
-        if func == 'print':
-            self.print_func(param)
+    # def call_rezerved(self, func, param):
+    #     if func == 'return':
+    #         self.return_func(param)
+    #     if func == 'print':
+    #         self.print_func(param)
 
     def __init__(self, path):
         with open(path, 'rb') as f:
             self.commands = f.read().decode().split('\n')
         self.index = 1
+        self.registry = Registry()
         self.context = {'variable': {},
                         'stack_trace': []}
         self.parse_context()
-        print(self.context)
         self.index = self.find_func('main', None)
         self.stack = []
-        print(self.commands)
 
     def parse_context(self):
         end_context = self.commands.index('ENDCONTEXT')
         while self.current()[0] not in ['ENDCONTEXT', '']:
             param = self.current()[1] if self.current()[1] else ''
+            name = self.current()[0]
             if not self.context['variable'].get(self.current()[0]):
-                self.context['variable'][self.current()[0]] = [None, None, {}]
-            self.context['variable'][self.current()[0]][0] = self.current()[0]
-            self.context['variable'][self.current()[0]][1] = 'function'
-            self.context['variable'][self.current()[0]][2][param] = int(self.current()[2]) + end_context + 1
+                self.context['variable'][name] = [None, None, {}]
+            # name
+            self.context['variable'][name][0] = name
+            # type
+            self.context['variable'][name][1] = 'function'
+            # line number
+            self.context['variable'][name][2][param] = int(self.current()[2]) + end_context + 1
             self.next()
 
     def return_func(self, param):
@@ -172,51 +200,48 @@ class Interpreter:
         return self.context['variable'][name][2][_args]
 
     def start_execute(self, context=None):
-        self.context['stack_trace'].append(self.current()[1])
         self.base_executor(context)
 
     def base_executor(self, context=None):
         context = context if context else deepcopy(self.context)
         # print(context)
         while self.current()[0] not in ['EFUNC', 'ENDBLOCK', 'ENDLOOP', '']:
-            print(self)
-            print(self.stack)
-            # print(context)
+            print(str(self))
+            # print(str(self) + '\t\t\t\t\t\t\t' + str(context['variable']))
+            # print(self.stack)
+            print(context)
             if self.current()[0] == 'EXPR':
                 self.expr_executor(context=context)
                 self.next()
                 continue
 
-            # ['DIM', *id.byte_code(), *self.type.byte_code(), 'ENDDIM']
             if self.current()[0] == 'DIM':
                 self.dim_executer(context=context)
                 self.next()
                 continue
 
-            # ['ASSIGN', *id.byte_code(), 'EXPR', *self.expr.byte_code(), 'ENDEXPR', 'ASSIGN']
             if self.current()[0] == 'ASSIGN':
-
                 assigment = self.next()
-
-                if assigment[0] == 'CALL':
-                    self.expr_executor(context=context)
-                    value = self.stack.pop()[0]
-                    variable, _type, name, index = self.stack.pop()
-
-                    self.check_type((variable, _type), value)
-                    context['variable'][name][2][index] = (value, _type)
-                    print(context['variable'][name])
-                else:
-                    name = assigment[1]
+                if assigment[0] == 'VAR':
+                    name = assigment[2]
                     variable = context['variable'][name]
 
                     self.check_context(name, 'variable', context)
+                    self.next()
                     self.expr_executor(context=context)
-                    value = self.stack.pop()[0]
+                    value = self.registry.registry['#out']
 
-                    self.check_type(variable, value)
                     context['variable'][name] = (value, variable[1])
-                    print(context['variable'][name])
+                    # print(context)
+                else:
+                    self.expr_executor(context=context)
+                    elem, index = self.registry.registry['#out']
+                    self.next()
+                    self.expr_executor(context=context)
+                    value = self.registry.registry['#out']
+
+                    context['variable'][elem][0][int(index)] = value
+                    print(context['variable'])
 
                 self.next()
                 continue
@@ -224,7 +249,7 @@ class Interpreter:
             if self.current()[0] == 'IF':
                 self.next()
                 self.expr_executor(context=context)
-                if self.stack.pop()[0]:
+                if self.registry.registry['#out']:
                     self.next()
                 self.next()
                 continue
@@ -256,78 +281,80 @@ class Interpreter:
 
             print('Unexpected command %s' % self.current())
             exit(5)
+
+        return context
         # print(self.context)
 
     def expr_executor(self, context):
         expr_stack = []
         while self.current():
-            print('\t' + str(self))
-            # print('\t' + str(expr_stack))
+            # print('\t' + str(self) + '\t' + str(self.registry.registry))
+            # print('\t' + str(self))
+            print('\t' + str(self.registry.registry))
             if self.current()[0] in bin_ops.keys():
-                right = expr_stack.pop()[0]
-                left = expr_stack.pop()[0]
-                if type(left) == int:
-                    expr_stack.append([bin_ops_int[self.current()[0]](left, int(right))])
-                    self.next()
-                    continue
-                if type(left) == str:
-                    expr_stack.append([bin_ops_str[self.current()[0]](left, str(right))])
-                    self.next()
-                    continue
-                if type(left) == bool:
-                    expr_stack.append([bin_ops_bool[self.current()[0]](left, bool(right))])
-                    self.next()
-                    continue
-                print('Unsupported binary operand %s for %s' % (bin_ops[self.current()[0]], type(left)))
-                exit(6)
+                left = self.current()[1]
+                right = self.current()[2]
+                result = self.current()[3]
+
+                left = self.registry.registry[left] if left in self.registry.registry.keys() else context['variable'][left][0]
+                right = self.registry.registry[right] if right in self.registry.registry.keys() else context['variable'][right][0]
+
+                if result in self.registry.registry.keys():
+                    self.registry.registry[result] = bin_ops[self.current()[0]](left, right)
+                else:
+                    context['variable'][result][0] = bin_ops[self.current()[0]](left, right)
+
+                self.next()
+                continue
 
             if self.current()[0] in un_ops.keys():
-                left = expr_stack.pop()[0]
-                if type(left) == int:
-                    expr_stack.append([un_ops_int[self.current()[0]](left)])
+                left = self.current()[1]
+                result = self.current()[2]
+                self.registry.registry[result] = un_ops[self.current()[0]](self.registry.registry[left])
+                self.next()
+                continue
+
+            if self.current()[0] == 'LOAD':
+                reg = self.current()[1]
+                value = None
+                if reg[1] == 'i':
+                    value = int(self.current()[2])
+                if reg[1] == 's':
+                    value = str(self.current()[2])
+                if reg[1] == 'b':
+                    value = True if self.current()[2].lower() == 'true' else False
+                if reg[:5] == '#TEMP':
+                    context['variable'][reg] = self.current()[2]
                     self.next()
                     continue
-                if type(left) == bool:
-                    expr_stack.append([un_ops_bool[self.current()[0]](left)])
-                    self.next()
-                    continue
-                print('Unsupported unary operand %s for %s' % (un_ops[self.current()[0]], type(left)))
-                exit(6)
 
-            if self.current()[0] in integer.keys():
-                _type = self.current()[0]
-                value = self.next()[0]
-                expr_stack.append([int(value, base=integer[_type])])
+                self.registry.registry[reg] = value
                 self.next()
                 continue
 
-            if self.current()[0] in string:
-                value = self.next()[0]
-                expr_stack.append([str(value)])
-                self.next()
-                continue
-
-            if self.current()[0] in boolean:
-                value = self.next()[0]
-                expr_stack.append([bool(value)])
-                self.next()
-                continue
-
-            if self.current()[0] == 'VAR':
-                name = self.current()[1]
-                # if name in reversed_func:
-                #     expr_stack.append([name])
-                #     self.next()
-                #     continue
+            if self.current()[0] == 'VLOAD':
+                reg = self.current()[1]
+                name = self.current()[2]
                 value = context['variable'][name][0]
-                if value:
-                    expr_stack.append(value)
+                self.registry.registry[reg] = value
                 self.next()
                 continue
 
-            # if self.current()[0] == 'INDEX':
-            #     name = self.next()[1]
-            #     print(self.current())
+            if self.current()[0] == 'TLOAD':
+                name = self.current()[1]
+                context['variable'][name] = [None, None]
+                self.next()
+                continue
+
+            if self.current()[0] == 'REMOVE':
+                temp = self.current()[1]
+                del context['variable'][temp]
+                self.next()
+                continue
+
+                # if self.current()[0] == 'INDEX':
+                #     name = self.next()[1]
+                #     print(self.current())
                 # self.expr_executor(context=context)
                 # index = int(self.stack.pop())
                 # value = context['variable'][name][0][index - 1][0]
@@ -336,17 +363,13 @@ class Interpreter:
                 # continue
 
             if self.current()[0] == 'CALL':
-                self.next()
-                self.expr_executor(context=context)
-                name = str(self.stack.pop())
-                params = []
-                self.next()
-                self.next()
-                while self.current()[0] != 'ENDPARAM':
-                    self.expr_executor(context=context)
-                    params.append(self.stack.pop()[0])
-                    self.next()
                 current_index = self.index
+                out = self.current()[1]
+                if self.current()[2][:5] == '#TEMP':
+                    name = context['variable'][self.current()[2]][0]
+                else:
+                    name = self.registry.registry[self.current()[2]]
+                params = self.current()[3:]
 
                 if context['variable'][name][1] == 'function':
                     self.index = self.find_func(name, params)
@@ -357,64 +380,52 @@ class Interpreter:
                     self.context['stack_trace'].pop()
                     self.next()
 
-                if context['variable'][name][1] == list:
-                    index = 1
-                    name, _type, value, array_n = context['variable'][name]
-                    out_of_index = False
-                    if len(params) != len(array_n):
-                        print('Array is %s-dimensional not %s' % (len(array_n), len(params)))
+                if type(context['variable'][name][0]) == list:
+                    if len(params) != 1:
+                        print('Array is %s-dimensional not %s' % (1, len(params)))
                         exit(5)
-                    for line, length in params, array_n:
-                        if index > length:
-                            print('Out of index error %s index %s<%s ' % (context['variable'][name][0],
-                                                                           context['variable'][name][3], len))
-                            exit(5)
-                        else:
-                            index += (line - 1) * length
-
-                    expr_stack.append((*context['variable'][name][2][index], name, index))
-                    # print(expr_stack)
+                    self.registry.registry[out] = name, self.registry.registry[params[0]]
                     self.next()
                 continue
 
-            if self.current()[0] == 'POP':
-                expr_stack.append(self.stack.pop())
-                self.next()
-                continue
+            # if self.current()[0] == 'POP':
+            #     expr_stack.append(self.stack.pop())
+            #     self.next()
+            #     continue
 
             if self.current()[0] == 'EXPR':
                 self.next()
                 continue
 
             if self.current()[0] == 'ENDEXPR':
-                self.stack.extend(expr_stack)
+                out_req = self.current()[1]
+                req = self.current()[2]
+                self.registry.registry[out_req] = self.registry.registry[req]
+                print('\t\t' + str(self.registry.registry[out_req]))
                 return
+
 
             print('Unexpected expr command %s' % self.current())
             exit(5)
+        return context
 
     def dim_executer(self, context):
         dim_stack = []
         name = ''
         while self.next():
             if self.current()[0] == 'VAR':
-                name = self.current()[1]
-                continue
-
-            if self.current()[0] == 'ARRAY':
-                dim_stack.append(int(self.next()[0]))
-                continue
-
-            if self.current()[0] in type_mapper.keys():
-                _type = type_mapper[self.current()[0]]
-                array = deepcopy(dim_stack)
-                len = 1
-                while dim_stack:
-                    len *= dim_stack.pop()
-                if len:
-                    context['variable'][name] = (name, list, [[None, _type] for _ in range(len)], array)
+                type = self.current()[1]
+                name = self.current()[2]
+                if type == 'ARRAY':
+                    self.next()
+                    while self.current()[0].upper() not in [*integer, *boolean, *string]:
+                        len = int(self.current()[0])
+                        context['variable'][name] = [[None for _ in range(len)], None]
+                        self.next()
+                    array_type = self.current()[0]
+                    context['variable'][name][1] = array_type
                 else:
-                    context['variable'][name] = (None, _type)
+                    context['variable'][name] = [None, type_mapper[type]]
                 print(context)
                 return
 
@@ -422,48 +433,3 @@ class Interpreter:
         index = 0
         for line, length in zip(pos, max):
             index += int(_len / length) * (line - 1)
-
-
-
-
-# def usage():
-#     print("""Run example:
-#     python interpreter.py -i ../output/linear_code.bin, -s test_binary
-#     Arguments:
-#     -i (--input)  - input files
-#     -s (--start)  - starting function
-#     -v            - detailed output
-#     --help        - help
-#     """)
-#
-#
-# def main():
-#     try:
-#         opts, args = getopt.getopt(sys.argv[1:], 'vi:o:v', ['help', 'start=', 'input='])
-#     except getopt.GetoptError:
-#         usage()
-#         sys.exit(2)
-#     start_func = ''
-#     input = None
-#     verbose = False
-#     for o, a in opts:
-#         if o == '-v':
-#             verbose = True
-#         if o in ('-h', '--help'):
-#             usage()
-#             sys.exit()
-#         if o in ('-s', '--start'):
-#             start_func = a
-#         if o in ('-i', '--input'):
-#             input = a.split(',')
-#     if input is None:
-#         print('Input file doesn\'t set. Use -i to set input files')
-#         usage()
-#         sys.exit(2)
-#
-#     interpreter = Interpreter(input, start_func)
-#     interpreter.start_execute()
-#
-#
-# if __name__ == "__main__":
-#     main()

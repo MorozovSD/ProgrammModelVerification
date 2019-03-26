@@ -67,7 +67,6 @@ class GraphFlow(Graph):
         parent = parent
         if statements:
             for statement in statements:
-                print(statement, context)
                 if type(statement) == Break:
                     self.add_value(parent, statement)
                     parent = statement
@@ -82,9 +81,18 @@ class GraphFlow(Graph):
                 if type(statement) == Assignment:
                     var_type = ''
                     for id in statement.identifiers:
+                        if type(id) == CallOrIndexer:
+                            id.expr_check(context)
+                            continue
+
                         id.type = context[id.name].type
                         var_type = var_type if var_type else id.type
-                        if var_type not in type_conversion[id.type]:
+                        # arrays
+                        if id.type[:5] == 'ARRAY':
+                            if var_type[:5] != id.type[:5]:
+                                raise VariableTypeException(id.type, var_type, id.pos)
+
+                        elif var_type not in type_conversion[id.type]:
                             raise VariableTypeException(type_conversion[id.type], var_type, id.pos)
 
                     statement.expr.expr_check(context, var_type)
@@ -95,7 +103,10 @@ class GraphFlow(Graph):
 
                 if type(statement) == Declaration:
                     for id in statement.identifiers:
-                        id.type = statement.type.role
+                        if type(statement.type) == Array:
+                            id.type = statement.type.role
+                        else:
+                            id.type = statement.type.role
                         context[id.name] = ContextValue(statement.type.role)
                     self.add_value(parent, statement)
                     parent = statement
@@ -114,12 +125,12 @@ class GraphFlow(Graph):
 
                     if statement.then_stmt:
                         self.add_value(statement.expr, then_start)
-                        then_end = self.build_graph(statement.then_stmt, parent=then_start, context=deepcopy(context))
+                        then_end = self.build_graph(statement.then_stmt, parent=then_start, context=context)
                         self.add_value(then_end, end_if)
 
                     if statement.else_stmt:
                         self.add_value(statement.expr, else_start)
-                        else_end = self.build_graph(statement.else_stmt, parent=else_start, context=deepcopy(context))
+                        else_end = self.build_graph(statement.else_stmt, parent=else_start, context=context)
                         self.add_value(else_end, end_if)
 
                     if not statement.then_stmt and not statement.else_stmt:
@@ -136,7 +147,7 @@ class GraphFlow(Graph):
                         expr = NodeValue(role=statement.loop_type, pos=statement.pos)
 
                         self.add_value(parent, loop)
-                        loop_end = self.build_graph(statement.do_stmt, parent=loop, context=deepcopy(context))
+                        loop_end = self.build_graph(statement.do_stmt, parent=loop, context=context)
                         self.add_value(loop_end, expr)
                         self.add_value(expr, statement.expr)
 
@@ -151,7 +162,7 @@ class GraphFlow(Graph):
                         self.add_value(parent, expr)
                         self.add_value(expr, statement.expr)
                         self.add_value(statement.expr, loop)
-                        loop_end = self.build_graph(statement.do_stmt, parent=loop, context=deepcopy(context))
+                        loop_end = self.build_graph(statement.do_stmt, parent=loop, context=context)
                         self.add_value(loop_end, end)
                         self.add_value(loop_end, statement.expr)
                         parent = end

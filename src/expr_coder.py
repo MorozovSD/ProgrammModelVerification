@@ -9,7 +9,7 @@ WARNING = '\033[93m'
 ENDC = '\033[0m'
 
 
-class req:
+class Req:
     def __init__(self, state, value):
         self.state = state
         self.value = value
@@ -21,26 +21,27 @@ class req:
         self.state = 'busy'
 
 
-class registry:
+class Registry:
     def __init__(self):
         self.temp_var_id = 0
-        self.registry_int = [req('free', '#i1'),
-                             req('free', '#i2'),
-                             req('free', '#i3'),
-                             req('free', '#i4'),
-                             req('free', '#i5')]
+        self.out = Req('free', '#out')
+        self.registry_int = [Req('free', '#i1'),
+                             Req('free', '#i2'),
+                             Req('free', '#i3'),
+                             Req('free', '#i4'),
+                             Req('free', '#i5')]
 
-        self.registry_str = [req('free', '#s1'),
-                             req('free', '#s2'),
-                             req('free', '#s3'),
-                             req('free', '#s4'),
-                             req('free', '#s5')]
+        self.registry_str = [Req('free', '#s1'),
+                             Req('free', '#s2'),
+                             Req('free', '#s3'),
+                             Req('free', '#s4'),
+                             Req('free', '#s5')]
 
-        self.registry_bool = [req('free', '#b1'),
-                              req('free', '#b2'),
-                              req('free', '#b3'),
-                              req('free', '#b4'),
-                              req('free', '#b5')]
+        self.registry_bool = [Req('free', '#b1'),
+                              Req('free', '#b2'),
+                              Req('free', '#b3'),
+                              Req('free', '#b4'),
+                              Req('free', '#b5')]
 
     def free(self, value):
         for reg in self.registry_int:
@@ -68,7 +69,7 @@ class registry:
         for reg in self.registry_bool:
             reg.free()
 
-    def find_free(self, type):
+    def find_free(self, type, registry_command):
         if type in integer:
             for reg in self.registry_int:
                 if reg.state == 'free':
@@ -88,6 +89,7 @@ class registry:
                     return reg.value
             print(WARNING + 'No free boolean registry, create temp variable' + ENDC)
         self.temp_var_id += 1
+        registry_command.append('TLOAD ' + '#TEMP_' + str(self.temp_var_id))
         return '#TEMP_' + str(self.temp_var_id)
 
 
@@ -115,7 +117,7 @@ integer = {'DEC': 10,
 
 reversed_func = ['return', 'print']
 
-string = ['string', 'CHAR']
+string = ['STRING', 'CHAR']
 boolean = ['BOOL']
 _type = {str(str): 'string',
          str(bool): 'bool',
@@ -128,7 +130,7 @@ class ExprCoder:
         self.index = 0
         self.stack = []
         self.registry_command = []
-        self.registry = registry()
+        self.registry = Registry()
 
     def current(self):
         return self.commands[self.index].split(' ')
@@ -148,11 +150,14 @@ class ExprCoder:
 
     def expr_executor(self):
         expr_stack = []
+        print(self.commands)
         while self.current():
+            print(self)
+            print(self.registry_command)
             if self.current()[0] in bin_ops:
                 right = expr_stack.pop()
                 left = expr_stack.pop()
-                to = self.registry.find_free(self.current()[1])
+                to = self.registry.find_free(self.current()[1], self.registry_command)
                 self.registry_command.append(self.current()[0] + ' ' + left + ' ' + right + ' ' + to)
                 if right[:2] == '#T':
                     self.registry_command.append('REMOVE ' + right)
@@ -174,7 +179,7 @@ class ExprCoder:
                 continue
 
             if self.current()[0] in integer:
-                reg = self.registry.find_free(self.current()[0])
+                reg = self.registry.find_free(self.current()[0], self.registry_command)
                 value = self.current()[1]
                 self.registry_command.append('LOAD ' + reg + ' ' + value)
                 expr_stack.append(reg)
@@ -182,7 +187,7 @@ class ExprCoder:
                 continue
 
             if self.current()[0] in string:
-                reg = self.registry.find_free(self.current()[0])
+                reg = self.registry.find_free(self.current()[0], self.registry_command)
                 value = self.current()[1]
                 self.registry_command.append('LOAD ' + reg + ' ' + value)
                 expr_stack.append(reg)
@@ -190,7 +195,7 @@ class ExprCoder:
                 continue
 
             if self.current()[0] in boolean:
-                reg = self.registry.find_free(self.current()[0])
+                reg = self.registry.find_free(self.current()[0], self.registry_command)
                 value = self.current()[1]
                 self.registry_command.append('LOAD ' + reg + ' ' + value)
                 expr_stack.append(reg)
@@ -198,58 +203,47 @@ class ExprCoder:
                 continue
 
             if self.current()[0] == 'VAR':
-                reg = self.registry.find_free(self.current()[1])
+                reg = self.registry.find_free(self.current()[1], self.registry_command)
                 value = self.current()[2]
-                self.registry_command.append('LOAD ' + reg + ' ' + value)
+                self.registry_command.append('VLOAD ' + reg + ' ' + value)
                 expr_stack.append(reg)
                 self.next()
                 continue
 
-            # if self.current()[0] == 'CALL':
-            #     self.next()
-            #     self.expr_executor(context=context)
-            #     name = str(self.stack.pop())
-            #     params = []
-            #     self.next()
-            #     self.next()
-            #     while self.current()[0] != 'ENDPARAM':
-            #         self.expr_executor(context=context)
-            #         params.append(self.stack.pop()[0])
-            #         self.next()
-            #     current_index = self.index
-            #
-            #     if context['variable'][name][1] == 'function':
-            #         self.index = self.find_func(name, params)
-            #         func_context = deepcopy(self.context)
-            #         self.start_execute(func_context)
-            #         # expr_stack.append(self.stack.pop())
-            #         self.index = current_index
-            #         self.context['stack_trace'].pop()
-            #         self.next()
-            #
-            #     if context['variable'][name][1] == list:
-            #         index = 1
-            #         name, _type, value, array_n = context['variable'][name]
-            #         out_of_index = False
-            #         if len(params) != len(array_n):
-            #             print('Array is %s-dimensional not %s' % (len(array_n), len(params)))
-            #             exit(5)
-            #         for line, length in params, array_n:
-            #             if index > length:
-            #                 print('Out of index error %s index %s<%s ' % (context['variable'][name][0],
-            #                                                               context['variable'][name][3], len))
-            #                 exit(5)
-            #             else:
-            #                 index += (line - 1) * length
-            #
-            #         expr_stack.append((*context['variable'][name][2][index], name, index))
-            #         # print(expr_stack)
-            #         self.next()
-            #     continue
+            if self.current()[0] == 'CALL':
+                # self.registry_command.append('CALL')
+                self.next()
+                reg_name = self.expr_executor()
+                self.next()
+                self.next()
+                # self.registry_command.append('LOAD ' + reg_name + ' #out')
+                params = ''
+                while self.current()[0] != 'ENDPARAMS':
+                    params += ' ' + self.expr_executor()
+                    self.next()
+
+                self.registry_command.append('CALL #out ' + reg_name + params)
+                expr_stack.append('#out')
+                self.next()
+
+                if reg_name[:2] == '#T':
+                    self.registry_command.append('REMOVE ' + reg_name)
+                else:
+                    self.registry.free(reg_name)
+
+                for param in params.strip().split(' '):
+                    if param[:2] == '#T':
+                        self.registry_command.append('REMOVE ' + param)
+                    else:
+                        self.registry.free(param)
+                continue
 
             if self.current()[0] == 'ENDEXPR':
-                self.registry_command.append('ENDEXPR')
+                self.registry_command.append('ENDEXPR ' + '#out ' + expr_stack.pop())
                 return self.registry_command
+
+            if self.current()[0] in ['ENDNAME', 'ENDPARAM']:
+                return expr_stack.pop()
 
             print('Unexpected expr command %s' % self.current())
             exit(5)

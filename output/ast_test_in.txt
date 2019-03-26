@@ -5,36 +5,82 @@
     │   │   └── main
     │   └── argDefs
     └── statements
-        ├── dim [a] as type bool : 7 : Line 7
+        ├── dim [b] as type string : 14 : Line 14
+        │   └── dim
+        │       ├── names
+        │       │   └── [b]
+        │       └── type
+        │           └── string : 14
+        ├── dim [c] as type string : 15 : Line 15
+        │   └── dim
+        │       ├── names
+        │       │   └── [c]
+        │       └── type
+        │           └── string : 15
+        ├── dim [a] as type string : 16 : Line 16
         │   └── dim
         │       ├── names
         │       │   └── [a]
         │       └── type
-        │           └── bool : 7
-        └── [a] = 5 > 3 + 3 : Line 8
+        │           └── string : 16
+        ├── [a] = a : Line 17
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [a]
+        │       └── value
+        │           └── a
+        │               └── literal
+        │                   ├── type
+        │                   │   └── a
+        │                   └── value
+        │                       └── char
+        ├── [b] = a : Line 18
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [b]
+        │       └── value
+        │           └── a
+        │               └── literal
+        │                   ├── type
+        │                   │   └── a
+        │                   └── value
+        │                       └── char
+        ├── [c] = 1 : Line 19
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [c]
+        │       └── value
+        │           └── 1
+        │               └── literal
+        │                   ├── type
+        │                   │   └── 1
+        │                   └── value
+        │                       └── char
+        ├── dim [aa1] as type array of int : 22 : Line 22
+        │   └── dim
+        │       ├── names
+        │       │   └── [aa1]
+        │       └── type
+        │           └── array of int : 22
+        ├── [[aa1]([1])] = 1 : Line 23
+        │   └── assignment
+        │       ├── identifiers
+        │       │   └── [[aa1]([1])]
+        │       └── value
+        │           └── 1
+        │               └── literal
+        │                   ├── type
+        │                   │   └── 1
+        │                   └── value
+        │                       └── dec
+        └── [[aa1]([0])] = 10 : Line 24
             └── assignment
                 ├── identifiers
-                │   └── [a]
+                │   └── [[aa1]([0])]
                 └── value
-                    └── 5 > 3 + 3
-                        └── >
-                            ├── 5
-                            │   └── literal
-                            │       ├── type
-                            │       │   └── 5
-                            │       └── value
-                            │           └── dec
-                            └── 3 + 3
-                                └── +
-                                    ├── 3
-                                    │   └── literal
-                                    │       ├── type
-                                    │       │   └── 3
-                                    │       └── value
-                                    │           └── dec
-                                    └── 3
-                                        └── literal
-                                            ├── type
-                                            │   └── 3
-                                            └── value
-                                                └── dec
+                    └── 10
+                        └── literal
+                            ├── type
+                            │   └── 10
+                            └── value
+                                └── dec

@@ -173,7 +173,7 @@ def p_commas(p):
     """commas :
               | commas COMMA"""
     if len(p) == 1:
-        p[0] = 0
+        p[0] = 1
     if len(p) == 3:
         p[0] = p[1] + 1
 
@@ -220,7 +220,7 @@ def p_statements(p):
 
 
 def p_statement(p):
-    """statement : var
+    """statement : var SEMICOLON
                  | if
                  | while
                  | do
