@@ -97,7 +97,7 @@ def p_externFuncDef(p):
 def p_funcDef(p):
     """funcDef : FUNCTION funcSignature statements END FUNCTION"""
     stmts = NodeValue(role='statements', children=p[3])
-    p[0] = Function(signature=p[2], statements=p[3], pos=set_pos(p, 1), children=[p[2], stmts])
+    p[0] = Function(signature=p[2], statements=[*p[2].args, *p[3]], pos=set_pos(p, 1), children=[p[2], stmts])
 
 
 def p_funcSignature(p):

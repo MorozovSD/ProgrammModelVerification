@@ -1,32 +1,61 @@
 CONTEXT
 EXFUNC user32 MessageBoxW MessageBoxW INT INT STRING STRING INT
 FUNC main  0
-FUNC main2  23
+FUNC main1  114
+FUNC main2  150
 ENDCONTEXT
 FUNC main 
-EXPR
+DIM
+VAR VOID main
+DIM
+VAR ARRAY a
+3
+bool
+ASSIGN
 CALL
-LOAD #s1 'main2'
+LOAD #s1 'a'
 ENDEXPR #out #s1
 ENDNAME
+LOAD #i1 0
+ENDEXPR #out #i1
 ENDPARAMS
 ENDEXPR #out #out
-EXPR
+LOAD #b1 true
+ENDEXPR #out #b1
+ASSIGN
 CALL
-LOAD #s1 'main2'
+LOAD #s1 'a'
 ENDEXPR #out #s1
 ENDNAME
+LOAD #i1 1
+ENDEXPR #out #i1
 ENDPARAMS
 ENDEXPR #out #out
-EXPR
 CALL
-LOAD #s1 'main2'
+LOAD #s1 'a'
 ENDEXPR #out #s1
 ENDNAME
+LOAD #i1 0
+ENDEXPR #out #i1
 ENDPARAMS
 ENDEXPR #out #out
-EFUNC
-FUNC main2 
+ASSIGN
+CALL
+LOAD #s1 'a'
+ENDEXPR #out #s1
+ENDNAME
+LOAD #i1 2
+ENDEXPR #out #i1
+ENDPARAMS
+ENDEXPR #out #out
+CALL
+LOAD #s1 'a'
+ENDEXPR #out #s1
+ENDNAME
+LOAD #i1 0
+ENDEXPR #out #i1
+ENDPARAMS
+ENDEXPR #out #out
 EXPR
 CALL
 LOAD #s1 'MessageBoxW'
@@ -41,5 +70,109 @@ ENDEXPR #out #s3
 LOAD #i2 1
 ENDEXPR #out #i2
 ENDPARAMS
+ENDEXPR #out #out
+EXPR
+CALL
+LOAD #s1 'main2'
+ENDEXPR #out #s1
+ENDNAME
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+CALL
+LOAD #s1 'main2'
+ENDEXPR #out #s1
+ENDNAME
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+CALL
+LOAD #s1 'main2'
+ENDEXPR #out #s1
+ENDNAME
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+CALL
+LOAD #s1 'main1'
+ENDEXPR #out #s1
+ENDNAME
+LOAD #s2 'test1'
+ENDEXPR #out #s2
+LOAD #s3 'test111'
+ENDEXPR #out #s3
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+CALL
+LOAD #s1 'main1'
+ENDEXPR #out #s1
+ENDNAME
+LOAD #s2 'test111'
+ENDEXPR #out #s2
+LOAD #s3 'test1167567'
+ENDEXPR #out #s3
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+LOAD #out main
+ENDEXPR #out #out
+EFUNC
+FUNC main1 string_string
+DIM
+VAR VOID main1
+DIM
+VAR STRING handleKind
+ASSIGN
+VAR STRING handleKind
+POP
+ENDEXPR #out #out
+DIM
+VAR STRING something
+ASSIGN
+VAR STRING something
+POP
+ENDEXPR #out #out
+EXPR
+CALL
+LOAD #s1 'MessageBoxW'
+ENDEXPR #out #s1
+ENDNAME
+LOAD #i1 0
+ENDEXPR #out #i1
+TEMPORARY_LOAD #TEMP_1
+VARIABLE_LOAD #TEMP_1 handleKind
+ENDEXPR #out #TEMP_1
+TEMPORARY_LOAD #TEMP_2
+VARIABLE_LOAD #TEMP_2 something
+ENDEXPR #out #TEMP_2
+LOAD #i2 1
+ENDEXPR #out #i2
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+LOAD #out main1
+ENDEXPR #out #out
+EFUNC
+FUNC main2 
+DIM
+VAR VOID main2
+EXPR
+CALL
+LOAD #s1 'MessageBoxW'
+ENDEXPR #out #s1
+ENDNAME
+LOAD #i1 0
+ENDEXPR #out #i1
+LOAD #s2 'test1'
+ENDEXPR #out #s2
+LOAD #s3 'test2'
+ENDEXPR #out #s3
+LOAD #i2 1
+ENDEXPR #out #i2
+ENDPARAMS
+ENDEXPR #out #out
+EXPR
+LOAD #out main2
 ENDEXPR #out #out
 EFUNC

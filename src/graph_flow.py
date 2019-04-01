@@ -167,6 +167,19 @@ class GraphFlow(Graph):
                         self.add_value(loop_end, statement.expr)
                         parent = end
                     continue
+
+                if type(statement) == Argument:
+                    if type(statement.expected_type) == Array:
+                        statement.identifier.type = statement.expected_type.role
+                    else:
+                        statement.identifier.type = statement.expected_type.role
+                    context[statement.identifier.name] = ContextValue(statement.expected_type.role)
+                    self.add_value(parent, statement)
+                    parent = statement
+                    continue
+
+                raise UnknownStatementException(statement)
+
         return parent
 
     def print(self):

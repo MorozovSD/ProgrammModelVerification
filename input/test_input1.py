@@ -1,18 +1,25 @@
 declare function MessageBoxW(handleKind as int, Title as string, Message as string, SomeThing as int) as int lib user32
 
 function main()
+dim a as bool(,,)
+a(0) = true;
+a(1) = a(0);
+a(2) = a(0);
+# a(0) = a(1) and a(1);
+MessageBoxW(0, "test1", "test2", 1);
 main2();
 main2();
 main2();
-# main1("test1");
-# main1("test2");
-# main1("test3");
+#
+main1("test1", "test111");
+#
+main1("test111", "test1167567");
 end function
 
 
-# function main1(handleKind as str)
-# MessageBoxW(0, handleKind, handleKind, 1);
-# end function
+function main1(handleKind as string, something as string)
+MessageBoxW(0, handleKind, something, 1);
+end function
 
 function main2()
 MessageBoxW(0, "test1", "test2", 1);

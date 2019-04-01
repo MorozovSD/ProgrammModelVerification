@@ -150,10 +150,10 @@ class ExprCoder:
 
     def expr_executor(self):
         expr_stack = []
-        print(self.commands)
+        # print(self.commands)
         while self.current():
-            print(self)
-            print(self.registry_command)
+            # print(self)
+            # print(self.registry_command)
             if self.current()[0] in bin_ops:
                 right = expr_stack.pop()
                 left = expr_stack.pop()

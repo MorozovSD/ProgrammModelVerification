@@ -85,7 +85,8 @@ type_mapper = {'DEC': int,
                'ULONG': int,
                'STRING': str,
                'CHAR': str,
-               'BOOL': bool}
+               'BOOL': bool,
+               'VOID': int}
 
 type_to_c_types = {'DEC': ctypes.c_int,
                    'HEX': ctypes.c_int,
@@ -205,16 +206,28 @@ class Interpreter:
         return self.context['func'][name][1][_args]
 
     def start_execute(self, context=None):
-        self.base_executor(context)
+        if context:
+            context = context
+        else:
+            context = {'variable': deepcopy(self.context['variable']),
+                       'array': deepcopy(self.context['array']),
+                       'func': deepcopy(self.context['func'])}
+        self.base_executor(context=context)
 
     def base_executor(self, context=None):
-        context = context if context else deepcopy(self.context['variable'])
+        if context:
+            context = context
+        else:
+            context = {'variable': deepcopy(self.context['variable']),
+                       'array': deepcopy(self.context['array']),
+                       'func': deepcopy(self.context['func'])}
+
         # print(context)
         while self.current()[0] not in ['EFUNC', 'ENDBLOCK', 'ENDLOOP', '']:
-            print(str(self))
+            # print(str(self))
             # print(str(self) + '\t\t\t\t\t\t\t' + str(context['variable']))
             # print(self.stack)
-            print(context)
+            # print(context)
             if self.current()[0] == 'EXPR':
                 self.expr_executor(context=context)
                 self.next()
@@ -229,24 +242,25 @@ class Interpreter:
                 assigment = self.next()
                 if assigment[0] == 'VAR':
                     name = assigment[2]
-                    variable = context[name]
+                    variable = context['variable'][name]
 
-                    self.check_context(name, context)
+                    self.check_context(name, context['variable'])
                     self.next()
                     self.expr_executor(context=context)
                     value = self.registry.registry['#out']
 
-                    context[name] = (value, variable[1])
+                    context['variable'][name] = (value, variable[1])
                     # print(context)
                 else:
                     self.expr_executor(context=context)
-                    elem, index = self.registry.registry['#out']
+                    index = self.stack.pop()
+                    elem = self.stack.pop()
                     self.next()
                     self.expr_executor(context=context)
                     value = self.registry.registry['#out']
 
                     context['variable'][elem][0][int(index)] = value
-                    print(context['variable'])
+                    print(context)
 
                 self.next()
                 continue
@@ -295,21 +309,21 @@ class Interpreter:
         while self.current():
             # print('\t' + str(self) + '\t' + str(self.registry.registry))
             # print('\t' + str(self))
-            print('\t' + str(self.registry.registry))
+            # print('\t' + str(self.registry.registry))
             if self.current()[0] in bin_ops.keys():
                 left = self.current()[1]
                 right = self.current()[2]
                 result = self.current()[3]
 
                 left = self.registry.registry[left] if left in self.registry.registry.keys() else \
-                context[left][0]
+                context['variable'][left][0]
                 right = self.registry.registry[right] if right in self.registry.registry.keys() else \
-                context[right][0]
+                context['variable'][right][0]
 
                 if result in self.registry.registry.keys():
                     self.registry.registry[result] = bin_ops[self.current()[0]](left, right)
                 else:
-                    context[result][0] = bin_ops[self.current()[0]](left, right)
+                    context['variable'][result][0] = bin_ops[self.current()[0]](left, right)
 
                 self.next()
                 continue
@@ -324,6 +338,12 @@ class Interpreter:
             if self.current()[0] == 'LOAD':
                 reg = self.current()[1]
                 value = None
+                # if type(self.registry.registry[reg]) == tuple:
+                #     value = self.registry.registry[reg]
+                #     value = context['array'][value[0]][0][value[1]]
+                #     self.registry.registry[reg] = value
+                #     self.next()
+                #     continue
                 if reg[1] == 'i':
                     value = int(self.current()[2])
                 if reg[1] == 's':
@@ -331,7 +351,7 @@ class Interpreter:
                 if reg[1] == 'b':
                     value = True if self.current()[2].lower() == 'true' else False
                 if reg[:5] == '#TEMP':
-                    context[reg] = self.current()[2]
+                    context['variable'][reg] = self.current()[2]
                     self.next()
                     continue
 
@@ -342,20 +362,20 @@ class Interpreter:
             if self.current()[0] == 'VARIABLE_LOAD':
                 reg = self.current()[1]
                 name = self.current()[2]
-                value = context[name][0]
+                value = context['variable'][name][0]
                 self.registry.registry[reg] = value
                 self.next()
                 continue
 
             if self.current()[0] == 'TEMPORARY_LOAD':
                 name = self.current()[1]
-                context[name] = [None, None]
+                context['variable'][name] = [None, None]
                 self.next()
                 continue
 
             if self.current()[0] == 'REMOVE':
                 temp = self.current()[1]
-                del context[temp]
+                del context['variable'][temp]
                 self.next()
                 continue
 
@@ -377,7 +397,7 @@ class Interpreter:
                 while self.current()[0] != 'ENDNAME':
                     name = self.registry.registry[self.expr_executor(context)]
                     self.next()
-                    print(name)
+                    # print(name)
                 self.next()
                 params = []
                 while self.current()[0] != 'ENDPARAMS':
@@ -390,14 +410,16 @@ class Interpreter:
                     self.registry.registry['#out'] = response
                     continue
                 if self.context['func'].get(name):
-                    params = params or ''
+                    params = list(reversed(params)) or ''
                     # safe registry
                     current_reg = deepcopy(self.registry.registry)
                     # safe index
                     current_index = deepcopy(self.index)
 
                     # execute function
-                    self.index = self.context['func'][name][1][params]
+                    self.index = self.context['func'][name][1]['']
+                    if params:
+                        self.stack += params
                     response = self.base_executor(context)
 
                     # return index
@@ -409,7 +431,10 @@ class Interpreter:
                     self.registry.registry['#out'] = response
                     continue
 
-                if self.context['array'].get(name):
+                if context['variable'].get(name):
+                    self.stack.append(name)
+                    self.stack.append(params[0])
+                    self.registry.registry['#out'] = context['variable'].get(name)[0][params[0]]
                     continue
 
                 print('Unknown name to call %s' % name)
@@ -439,10 +464,10 @@ class Interpreter:
                 #     self.next()
                 continue
 
-            # if self.current()[0] == 'POP':
-            #     expr_stack.append(self.stack.pop())
-            #     self.next()
-            #     continue
+            if self.current()[0] == 'POP':
+                self.registry.registry['#out'] = self.stack.pop()
+                self.next()
+                continue
 
             if self.current()[0] == 'EXPR':
                 self.next()
@@ -452,7 +477,7 @@ class Interpreter:
                 out_req = self.current()[1]
                 req = self.current()[2]
                 self.registry.registry[out_req] = self.registry.registry[req]
-                print('\t\t' + str(self.registry.registry[out_req]))
+                # print('\t\t' + str(self.registry.registry[out_req]))
                 return out_req
 
             print('Unexpected expr command %s' % self.current())
@@ -463,6 +488,9 @@ class Interpreter:
         dim_stack = []
         name = ''
         while self.next():
+            # name = self.current()[1]
+            # context['variable'][name] = [None]
+            # return
             if self.current()[0] == 'VAR':
                 type = self.current()[1]
                 name = self.current()[2]
@@ -470,13 +498,13 @@ class Interpreter:
                     self.next()
                     while self.current()[0].upper() not in [*integer, *boolean, *string]:
                         len = int(self.current()[0])
-                        context['array'][name] = [[None for _ in range(len)], None]
+                        context['variable'][name] = [[None for _ in range(len)], None]
                         self.next()
                     array_type = self.current()[0]
-                    context['array'][name][1] = array_type
+                    context['variable'][name][1] = array_type
                 else:
                     context['variable'][name] = [None, type_mapper[type]]
-                print(context)
+                # print(context)
                 return
 
     def get_index(self, _len, pos, max):

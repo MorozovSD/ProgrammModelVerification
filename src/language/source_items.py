@@ -3,7 +3,7 @@ from node import NodeValue
 
 
 class FuncSignature(NodeValue):
-    def __init__(self, name, args, pos=None, type=None, children=None, func_type=None):
+    def __init__(self, name, args, pos=None, type='VOID', children=None, func_type='VOID'):
         super().__init__(pos=pos, children=children)
         self.name = name
         self.args = args if args else ''
@@ -21,11 +21,11 @@ class FuncSignature(NodeValue):
         params_type = ''
         if self.args:
             for arg in filter(None, self.args):
-                func_stack += arg.byte_code_dim()
+                # func_stack += arg.byte_code_dim()
                 params_type += str(arg.expected_type.role) + '_'
             # for arg in filter(None, reversed(self.args)):
             #     func_stack += arg.byte_code_assign()
-        return ['FUNC ' + str(self.name) + ' ' + params_type[:-1]] + func_stack
+        return ['FUNC ' + str(self.name) + ' ' + params_type.strip('_'), 'DIM', 'VAR ' + self.func_type.upper() + ' ' + str(self.name), *func_stack]
 
 
 class Function(NodeValue):
@@ -43,18 +43,19 @@ class Function(NodeValue):
         return str(self.source_name) + '/' + str(self.signature.name) + ' (id: ' + self.id + ')'
 
     def args(self):
-        params_type = ''
-        if self.signature.args:
-            for arg in filter(None, self.signature.args):
-                params_type += str(arg.expected_type.role) + '_'
-        return params_type[:-1] + ' '
+        # params_type = ''
+        # if self.signature.args:
+        #     for arg in filter(None, self.signature.args):
+        #         params_type += str(arg.expected_type.role) + '_'
+        # return params_type[:-1] + ' '
+        return ' '
 
     def byte_code(self):
         func_stack = [*self.signature.byte_code()]
         if self.statements:
             for statement in filter(None, self.statements):
                 func_stack += statement.byte_code()
-        func_stack += ['EFUNC']
+        func_stack += ['EXPR', 'LOAD #out ' + self.signature.name,  'ENDEXPR #out #out','EFUNC']
 
         return func_stack
 

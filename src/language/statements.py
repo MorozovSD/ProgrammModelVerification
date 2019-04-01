@@ -139,5 +139,5 @@ class Declaration(Statements):
                 id.type = 'ARRAY'
                 stmt_stack += ['DIM', *id.byte_code(), *self.type.byte_code()]
             else:
-                stmt_stack += ['DIM ' + self.id.name]
+                stmt_stack += ['DIM', *id.byte_code()]
         return stmt_stack

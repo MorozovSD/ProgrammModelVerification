@@ -66,13 +66,19 @@ class Argument(NodeValue):
 
     def byte_code_dim(self):
         self.identifier.type = self.expected_type.role
-        return ['DIM ' + self.identifier.name]
+        return ['DIM', 'VAR ' + self.expected_type.role.upper() + ' ' + self.identifier.name]
+
+    def byte_code(self):
+        param_stack = []
+        param_stack += self.byte_code_dim()
+        param_stack += self.byte_code_assign()
+        return param_stack
 
     def byte_code_expected_type(self):
         return self.expected_type.role.upper()
 
     def byte_code_assign(self):
-        return ['ASSIGN', *self.identifier.byte_code(), 'POP', 'ENDEXPR']
+        return ['ASSIGN', *self.identifier.byte_code(), 'POP', 'ENDEXPR #out #out']
 
 
 class Array(NodeValue):

@@ -33,8 +33,13 @@ class UnaryTypeException(Exception):
         print(FAIL + 'Unexpected unary operand %s, for %s. Position %s' % (operand, expr, pos) + ENDC)
         sys.exit(-1)
 
-
 class NotImplementedYetExeption(Exception):
     def __init__(self, func, node):
         print(FAIL + 'For %s Function %s is not implemented' % (func, node) + ENDC)
+        sys.exit(-1)
+
+
+class UnknownStatementException(Exception):
+    def __init__(self, stmt):
+        print(FAIL + 'Unknown statement %s' % type(stmt) + ENDC)
         sys.exit(-1)
