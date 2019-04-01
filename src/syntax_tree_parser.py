@@ -86,12 +86,12 @@ def p_modifier(p):
 
 
 def p_externFuncDef(p):
-    """externFuncDef : DECLARE FUNCTION identifier LIB identifier
-                    | DECLARE FUNCTION identifier LIB identifier ALIAS identifier"""
-    if len(p) == 6:
-        p[0] = ExternFunction(name=p[3], lib_name=p[5], pos=set_pos(p, 1))
-    if len(p) == 8:
-        p[0] = ExternFunction(name=p[3], lib_name=p[5], alias=p[7], pos=set_pos(p, 1))
+    """externFuncDef : DECLARE FUNCTION identifier LBRACES argDefs RBRACES AS typeRef LIB identifier
+                     | DECLARE FUNCTION identifier LBRACES argDefs RBRACES AS typeRef LIB identifier ALIAS identifier"""
+    if len(p) == 11:
+        p[0] = ExternFunction(name=p[3], lib_name=p[10], args=p[5], return_type=p[8], pos=set_pos(p, 1))
+    if len(p) == 13:
+        p[0] = ExternFunction(name=p[3], lib_name=p[10], args=p[5], return_type=p[8], alias=p[12], pos=set_pos(p, 1))
 
 
 def p_funcDef(p):
@@ -119,7 +119,7 @@ def p_argDefs(p):
     if len(p) == 1:
         p[0] = []
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = [p[1]]
     if len(p) == 4:
         p[0] = []
         p[0] = add_to_list(p[0], p[1])
@@ -161,7 +161,7 @@ def p_builtin(p):
 
 def p_custom(p):
     """custom : identifier"""
-    p[0] = NodeValue(role=p[1].value, pos=set_pos(p, 1))
+    p[0] = NodeValue(role=p[1].name, pos=p[1].pos)
 
 
 def p_array(p):
@@ -201,6 +201,17 @@ def p_callOrIndexers(p):
         p[0] = add_to_list(p[0], p[1])
         p[0] = add_to_list(p[0], p[3])
 
+def p_paths(p):
+    """paths : path COMMA paths
+             | path"""
+    if len(p) == 2:
+        p[0] = []
+        p[0] = add_to_list(p[0], p[1])
+    if len(p) == 4:
+        p[0] = []
+        p[0] = add_to_list(p[0], p[1])
+        p[0] = add_to_list(p[0], p[3])
+
 
 def p_identifier(p):
     """identifier : IDENTIFIER"""
@@ -220,7 +231,7 @@ def p_statements(p):
 
 
 def p_statement(p):
-    """statement : var SEMICOLON
+    """statement : var
                  | if
                  | while
                  | do
@@ -328,12 +339,13 @@ def p_unary(p):
              | MINUS expr %prec UMINUS
     """
     unary = NodeValue(role=p[1], children=[p[2]])
-    p[0] = UnaryExpression(expr=p[2], operand=p[1], pos=p[1].pos, children=[unary])
+    p[0] = UnaryExpression(expr=p[2], operand=p[1], pos=set_pos(p, 1), children=[unary])
 
 
 def p_assignment(p):
     """assignment : identifiers ASSIGNMENT expr
                   | callOrIndexers ASSIGNMENT expr
+                  | paths ASSIGNMENT expr
     """
     identifiers = NodeValue(role='identifiers', children=[NodeValue(role=str(p[1]))])
     value = NodeValue(role='value', children=[p[3]])
@@ -348,8 +360,8 @@ def p_braces(p):
 
 
 def p_callOrIndexer(p):
-    """callOrIndexer : path LBRACES exprs RBRACES
-                     | GET path """
+    """callOrIndexer : expr LBRACES exprs RBRACES
+                     | path """
     if len(p) == 5:
         parameters = []
         if p[3]:
@@ -363,12 +375,8 @@ def p_callOrIndexer(p):
 
 
 def p_path(p):
-    """path : expr
-            | expr DOT path"""
-    p[0] = []
-    p[0] = add_to_list(p[0], p[1])
-    if len(p) == 4:
-        p[0] = add_to_list(p[0], p[3])
+    """path : expr DOT expr"""
+    p[0] = Path(left=p[1], right=p[3], pos=p[1].pos)
 
 
 # def p_index(p):

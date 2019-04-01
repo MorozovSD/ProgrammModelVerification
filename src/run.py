@@ -50,6 +50,7 @@ def main():
     calls = {}
     external = []
     external_byte_code = []
+    class_byte_code = []
     functions = []
     func_usage = {'CurrentlyUnknown': []}
     byte_code = []
@@ -69,23 +70,23 @@ def main():
         functions += ast_functions
 
         for external in ast_external:
-            byte_code += external.byte_code()
+            # byte_code += external.byte_code()
             external_byte_code += external.byte_code()
 
         for _class in ast_class:
             class_func = _class.get_functions()
-            class_external = _class.get_external()
-            functions += class_func
+            # class_external = _class.get_external()
+            # functions += class_func
             for func in class_func:
                 func_usage[func] = []
                 func_path = ast.source_name.split('/')[-1][:-4] + '_' + str(_class.name) + '_' + func.signature.name
-                graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
-                graphs.append(graph_flow)
+                # graph_flow = GraphFlow(func, ast.source_name + '/' + func.signature.name)
+                # graphs.append(graph_flow)
                 # graph_flow.to_png(path=output, name=func_path + '_graph')
-                byte_code_func[ast.source_name + '/' + func.signature.name] = len(byte_code)
-                byte_code += func.byte_code()
+                # byte_code_func[ast.source_name + '/' + func.signature.name] = len(byte_code)
+                # byte_code += func.byte_code()
             # external += class_external
-            byte_code += _class.byte_code()
+            class_byte_code += _class.byte_code()
 
         for func in ast_functions:
             func_usage[func] = []
@@ -99,15 +100,15 @@ def main():
         calls.update(ast.get_calls())
 
     # Unused code for func usage graph
-    for calls_path, _calls in calls.items():
-        for call in filter(None, _calls):
-            for func in functions:
-                if str(call.path[0]) == str(func.signature.name):
-                    # try:
-                        # if not call.call_func:
-                        call.call_func = func
-                        if calls_path not in func_usage[func]:
-                            func_usage[func].append(calls_path)
+    # for calls_path, _calls in calls.items():
+    #     for call in filter(None, _calls):
+    #         for func in functions:
+    #             if str(call.path[0]) == str(func.signature.name):
+    #                 try:
+    #                     if not call.call_func:
+    #                     call.call_func = func
+    #                     if calls_path not in func_usage[func]:
+    #                         func_usage[func].append(calls_path)
                         # else:
                         #     raise FunctionSourceException()
                     # except FunctionSourceException as e:
@@ -123,8 +124,10 @@ def main():
         f.write('CONTEXT\n'.encode())
         for i, line in enumerate(external_byte_code):
             f.write((line + '\n').encode())
+        for i, line in enumerate(class_byte_code):
+            f.write((line + '\n').encode())
         for func, place in byte_code_func.items():
-            f.write((str(func) + str(place) + '\n').encode())
+            f.write(('FUNC ' + str(func) + str(place) + '\n').encode())
         f.write('ENDCONTEXT\n'.encode())
         for i, line in enumerate(byte_code):
             f.write((line + '\n').encode())

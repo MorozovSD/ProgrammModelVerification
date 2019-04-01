@@ -171,7 +171,7 @@ class UnaryExpression(Expression):
         super().__init__(pos=pos, children=children)
         self.expr = expr
         self.operand = operand
-        self.type = None
+        self.type = ''
 
     def __repr__(self):
         return self.operand + str(self.expr)
@@ -216,12 +216,29 @@ class CallOrIndexer(Expression):
     def byte_code(self):
         parameters = []
         path = []
-        for p in self.path:
-            p.type = 'STRING'
-            path += [*p.byte_code(), 'ENDNAME']
+        from language import Identifier
+        if type(self.path) == Identifier:
+            path = ['STRING ' + self.path.name, 'ENDEXPR']
+        else:
+            path = self.path.byte_code()
         for p in self.parameters:
-            parameters += [*p.byte_code(), 'ENDPARAM']
-        return ['CALL', *path, 'PARAM', *parameters, 'ENDPARAMS']
+            parameters += [*p.byte_code(), 'ENDEXPR']
+        return ['CALL', *path, *parameters, 'ENDPARAMS']
+
+    def get_type(self, context):
+        return ['CallOrIndexer']
+
+class Path(Expression):
+    def __init__(self, left, right, pos=None):
+        super().__init__(pos=pos)
+        self.left = left
+        self.right = right
+
+    def __repr__(self):
+        return str(self.left) + '.' + str(self.right)
+
+    def byte_code(self):
+        return ['PATH', *self.left.byte_code(), 'ENDEXPR', *self.right.byte_code(), 'ENDEXPR', 'EPATH']
 
     def get_type(self, context):
         return ['CallOrIndexer']

@@ -87,6 +87,17 @@ type_mapper = {'DEC': int,
                'CHAR': str,
                'BOOL': bool}
 
+type_to_c_types = {'DEC': ctypes.c_int,
+                   'HEX': ctypes.c_int,
+                   'BITS': ctypes.c_int,
+                   'INT': ctypes.c_int,
+                   'UINT': ctypes.c_uint,
+                   'LONG': ctypes.c_long,
+                   'ULONG': ctypes.c_ulong,
+                   'STRING': ctypes.c_wchar_p,
+                   'CHAR': ctypes.c_char,
+                   'BOOL': ctypes.c_bool}
+
 integer = {'DEC': 10,
            'HEX': 16,
            'BITS': 2,
@@ -117,6 +128,10 @@ class Interpreter:
         self.index = 1
         self.registry = Registry()
         self.context = {'variable': {},
+                        'array': {},
+                        'func': {},
+                        'external_func': {},
+                        'class': {},
                         'stack_trace': []}
         self.parse_context()
         self.index = self.find_func('main', None)
@@ -125,44 +140,34 @@ class Interpreter:
     def parse_context(self):
         end_context = self.commands.index('ENDCONTEXT')
         while self.current()[0] not in ['ENDCONTEXT', '']:
-            param = self.current()[1] if self.current()[1] else ''
-            name = self.current()[0]
-            if not self.context['variable'].get(self.current()[0]):
-                self.context['variable'][name] = [None, None, {}]
-            # name
-            self.context['variable'][name][0] = name
-            # type
-            self.context['variable'][name][1] = 'function'
-            # line number
-            self.context['variable'][name][2][param] = int(self.current()[2]) + end_context + 1
-            self.next()
+            if self.current()[0] == 'FUNC':
+                name = self.current()[1]
+                param = self.current()[2] if self.current()[2] else ''
+                start_line = int(self.current()[3])
+                if not self.context['func'].get(self.current()[0]):
+                    self.context['func'][name] = [None, {}]
+                self.context['func'][name][0] = name
+                # different function by parameters count and types
+                self.context['func'][name][1][param] = start_line + end_context + 1
+                self.next()
+            if self.current()[0] == 'EXFUNC':
+                lib_name = self.current()[1]
+                func_name = self.current()[2]
+                alias_name = self.current()[3]
+                return_type = type_to_c_types[self.current()[4]]
+                args = []
+                for arg in self.current()[5:]:
+                    args.append(type_to_c_types[arg])
+                dll = ctypes.WinDLL(lib_name + '.dll')
+                external_func = ctypes.WINFUNCTYPE(return_type, *args)((func_name, dll))
+                self.context['external_func'][alias_name] = external_func
+                self.next()
 
     def return_func(self, param):
         self.stack.append(*param)
 
     def print_func(self, param):
         print(*param)
-
-    def extend_func(self, name, param):
-        #     os.chdir("C:\\Program Files\\Compact Automated Testing System V2.0")
-        #
-        # # Load DLL into memory.
-        # CATSDll = ctypes.WinDLL ("CATS.dll")
-        #
-        # # Set up prototype and parameters for the desired function call.
-        # CATSDllApiProto = ctypes.WINFUNCTYPE (ctypes.c_uint8,ctypes.c_double)
-        #
-        # CATSDllApiParams = (1, "p1", 0), (1, "p2", 0),
-        #
-        # # Actually map the call (setDACValue) to a Python name.
-        # CATSDllApi = CATSDllApiProto (("setDACValue", CATSDll), CATSDllApiParams)
-        #
-        # # Set up the variables and call the Python name with them.
-        # p1 = ctypes.c_uint8 (1)
-        # p2 = ctypes.c_double (4)
-        #
-        # CATSDllApi(p1,p2)
-        pass
 
     def current(self):
         return self.commands[self.index].split(' ')
@@ -180,9 +185,9 @@ class Interpreter:
     def __repr__(self):
         return 'Current comand %s %s' % (self.current(), str(self.index + 1))
 
-    def check_context(self, name, type, context=None):
+    def check_context(self, name, context=None):
         context = context if context else self.context
-        if not context[type].get(name):
+        if not context.get(name):
             print('Unknown %s name - %s' % (type, name))
             exit(7)
 
@@ -197,13 +202,13 @@ class Interpreter:
             for arg in filter(None, args):
                 _args += _type[str(type(arg))] + '_'
             _args = _args[:-1]
-        return self.context['variable'][name][2][_args]
+        return self.context['func'][name][1][_args]
 
     def start_execute(self, context=None):
         self.base_executor(context)
 
     def base_executor(self, context=None):
-        context = context if context else deepcopy(self.context)
+        context = context if context else deepcopy(self.context['variable'])
         # print(context)
         while self.current()[0] not in ['EFUNC', 'ENDBLOCK', 'ENDLOOP', '']:
             print(str(self))
@@ -224,14 +229,14 @@ class Interpreter:
                 assigment = self.next()
                 if assigment[0] == 'VAR':
                     name = assigment[2]
-                    variable = context['variable'][name]
+                    variable = context[name]
 
-                    self.check_context(name, 'variable', context)
+                    self.check_context(name, context)
                     self.next()
                     self.expr_executor(context=context)
                     value = self.registry.registry['#out']
 
-                    context['variable'][name] = (value, variable[1])
+                    context[name] = (value, variable[1])
                     # print(context)
                 else:
                     self.expr_executor(context=context)
@@ -275,13 +280,13 @@ class Interpreter:
                 continue
 
             if self.current()[0] == 'FUNC':
-                context['stack_trace'].append(self.current()[1])
+                self.context['stack_trace'].append(self.current()[1])
                 self.next()
                 continue
 
             print('Unexpected command %s' % self.current())
             exit(5)
-
+        self.context['stack_trace'].pop()
         return context
         # print(self.context)
 
@@ -296,13 +301,15 @@ class Interpreter:
                 right = self.current()[2]
                 result = self.current()[3]
 
-                left = self.registry.registry[left] if left in self.registry.registry.keys() else context['variable'][left][0]
-                right = self.registry.registry[right] if right in self.registry.registry.keys() else context['variable'][right][0]
+                left = self.registry.registry[left] if left in self.registry.registry.keys() else \
+                context[left][0]
+                right = self.registry.registry[right] if right in self.registry.registry.keys() else \
+                context[right][0]
 
                 if result in self.registry.registry.keys():
                     self.registry.registry[result] = bin_ops[self.current()[0]](left, right)
                 else:
-                    context['variable'][result][0] = bin_ops[self.current()[0]](left, right)
+                    context[result][0] = bin_ops[self.current()[0]](left, right)
 
                 self.next()
                 continue
@@ -320,11 +327,11 @@ class Interpreter:
                 if reg[1] == 'i':
                     value = int(self.current()[2])
                 if reg[1] == 's':
-                    value = str(self.current()[2])
+                    value = ' '.join(self.current()[2:]).strip('\'')
                 if reg[1] == 'b':
                     value = True if self.current()[2].lower() == 'true' else False
                 if reg[:5] == '#TEMP':
-                    context['variable'][reg] = self.current()[2]
+                    context[reg] = self.current()[2]
                     self.next()
                     continue
 
@@ -332,23 +339,23 @@ class Interpreter:
                 self.next()
                 continue
 
-            if self.current()[0] == 'VLOAD':
+            if self.current()[0] == 'VARIABLE_LOAD':
                 reg = self.current()[1]
                 name = self.current()[2]
-                value = context['variable'][name][0]
+                value = context[name][0]
                 self.registry.registry[reg] = value
                 self.next()
                 continue
 
-            if self.current()[0] == 'TLOAD':
+            if self.current()[0] == 'TEMPORARY_LOAD':
                 name = self.current()[1]
-                context['variable'][name] = [None, None]
+                context[name] = [None, None]
                 self.next()
                 continue
 
             if self.current()[0] == 'REMOVE':
                 temp = self.current()[1]
-                del context['variable'][temp]
+                del context[temp]
                 self.next()
                 continue
 
@@ -364,28 +371,72 @@ class Interpreter:
 
             if self.current()[0] == 'CALL':
                 current_index = self.index
-                out = self.current()[1]
-                if self.current()[2][:5] == '#TEMP':
-                    name = context['variable'][self.current()[2]][0]
-                else:
-                    name = self.registry.registry[self.current()[2]]
-                params = self.current()[3:]
+                self.next()
+                # get name
+                name = ''
+                while self.current()[0] != 'ENDNAME':
+                    name = self.registry.registry[self.expr_executor(context)]
+                    self.next()
+                    print(name)
+                self.next()
+                params = []
+                while self.current()[0] != 'ENDPARAMS':
+                    params.append(self.registry.registry[self.expr_executor(context)])
+                    self.next()
+                self.next()
 
-                if context['variable'][name][1] == 'function':
-                    self.index = self.find_func(name, params)
-                    func_context = deepcopy(self.context)
-                    self.start_execute(func_context)
-                    # expr_stack.append(self.stack.pop())
+                if self.context['external_func'].get(name):
+                    response = self.context['external_func'][name](*params)
+                    self.registry.registry['#out'] = response
+                    continue
+                if self.context['func'].get(name):
+                    params = params or ''
+                    # safe registry
+                    current_reg = deepcopy(self.registry.registry)
+                    # safe index
+                    current_index = deepcopy(self.index)
+
+                    # execute function
+                    self.index = self.context['func'][name][1][params]
+                    response = self.base_executor(context)
+
+                    # return index
                     self.index = current_index
-                    self.context['stack_trace'].pop()
-                    self.next()
 
-                if type(context['variable'][name][0]) == list:
-                    if len(params) != 1:
-                        print('Array is %s-dimensional not %s' % (1, len(params)))
-                        exit(5)
-                    self.registry.registry[out] = name, self.registry.registry[params[0]]
-                    self.next()
+                    # return registry
+                    self.registry.registry = current_reg
+
+                    self.registry.registry['#out'] = response
+                    continue
+
+                if self.context['array'].get(name):
+                    continue
+
+                print('Unknown name to call %s' % name)
+                exit(5)
+                # out = self.current()[1]
+                # get params
+                # if self.current()[2][:5] == '#TEMP':
+                #     name = context[self.current()[2]][0]
+                # else:
+                #     name = self.registry.registry[self.current()[2]]
+                # params = self.current()[3:]
+                #
+                # if context[name][1] == 'function':
+                #     self.index = self.find_func(name, params)
+                #     func_context = deepcopy(self.context)
+                #     self.start_execute(func_context)
+                #     # expr_stack.append(self.stack.pop())
+                #     self.index = current_index
+                #     self.context['stack_trace'].pop()
+                #     self.next()
+                #
+                # if type(context[name][0]) == list:
+                #     if len(params) != 1:
+                #         print('Array is %s-dimensional not %s' % (1, len(params)))
+                #         exit(5)
+                #     self.registry.registry[out] = name, self.registry.registry[params[0]]
+                #     self.next()
                 continue
 
             # if self.current()[0] == 'POP':
@@ -402,8 +453,7 @@ class Interpreter:
                 req = self.current()[2]
                 self.registry.registry[out_req] = self.registry.registry[req]
                 print('\t\t' + str(self.registry.registry[out_req]))
-                return
-
+                return out_req
 
             print('Unexpected expr command %s' % self.current())
             exit(5)
@@ -420,10 +470,10 @@ class Interpreter:
                     self.next()
                     while self.current()[0].upper() not in [*integer, *boolean, *string]:
                         len = int(self.current()[0])
-                        context['variable'][name] = [[None for _ in range(len)], None]
+                        context['array'][name] = [[None for _ in range(len)], None]
                         self.next()
                     array_type = self.current()[0]
-                    context['variable'][name][1] = array_type
+                    context['array'][name][1] = array_type
                 else:
                     context['variable'][name] = [None, type_mapper[type]]
                 print(context)

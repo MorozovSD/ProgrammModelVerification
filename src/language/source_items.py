@@ -23,8 +23,8 @@ class FuncSignature(NodeValue):
             for arg in filter(None, self.args):
                 func_stack += arg.byte_code_dim()
                 params_type += str(arg.expected_type.role) + '_'
-            for arg in filter(None, reversed(self.args)):
-                func_stack += arg.byte_code_assign()
+            # for arg in filter(None, reversed(self.args)):
+            #     func_stack += arg.byte_code_assign()
         return ['FUNC ' + str(self.name) + ' ' + params_type[:-1]] + func_stack
 
 
@@ -60,21 +60,27 @@ class Function(NodeValue):
 
 
 class ExternFunction(NodeValue):
-    def __init__(self, name, lib_name, alias=None, pos=None, children=None):
+    def __init__(self, name, args, return_type, lib_name, alias=None, pos=None, children=None):
         super().__init__(pos=pos, children=children)
         self.name = name
+        self.args = args
+        self.return_type = return_type
         self.lib_name = lib_name
         self.alias = alias if alias else name
         self.source_name = None
 
     def __repr__(self):
-        return 'External: ' + str(self.lib_name) + '/' + str(self.name)+ ' as ' + str(self.alias) + ' : Line ' + str(self.pos['line'])
+        return 'External: ' + str(self.lib_name) + '/' + str(self.name) + str(self.args) + ' as ' + str(self.return_type) + 'alias' + str(self.alias) + ' : Line ' + str(self.pos['line'])
 
     def uniq_str(self):
-        return 'External: ' + str(self.lib_name) + '/' + str(self.name) + ' as ' + str(self.alias) + ' (id: ' + self.id + ')'
+        return 'External: ' + str(self.lib_name) + '/' + str(self.name) + str(self.args) + ' as ' + str(self.return_type) + 'alias' + str(self.alias) + ' (id: ' + self.id + ')'
 
     def byte_code(self):
-        return ['EXFUNC ' + str(self.lib_name), str(self.name), str(self.alias), 'ENDEXFUNC']
+        args = ''
+        for arg in self.args:
+            args += arg.byte_code_expected_type() + ' '
+            # args += arg.byte_code_assign()
+        return ['EXFUNC ' + str(self.lib_name) + ' ' + str(self.name) + ' ' + str(self.alias) + ' ' + str(self.return_type.role.upper()) + ' ' + args.strip()]
 
 
 class Class(NodeValue):

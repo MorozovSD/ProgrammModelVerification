@@ -27,7 +27,7 @@ class Literal(NodeValue):
 
 
 class Identifier(NodeValue):
-    def __init__(self, name, value=None, pos='', type=None, children=None):
+    def __init__(self, name, value=None, pos='', type='', children=None):
         super().__init__(pos=pos, children=children)
         self.value = value
         self.type = type
@@ -66,7 +66,10 @@ class Argument(NodeValue):
 
     def byte_code_dim(self):
         self.identifier.type = self.expected_type.role
-        return ['DIM', *self.identifier.byte_code()]
+        return ['DIM ' + self.identifier.name]
+
+    def byte_code_expected_type(self):
+        return self.expected_type.role.upper()
 
     def byte_code_assign(self):
         return ['ASSIGN', *self.identifier.byte_code(), 'POP', 'ENDEXPR']

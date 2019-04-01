@@ -89,7 +89,7 @@ class Registry:
                     return reg.value
             print(WARNING + 'No free boolean registry, create temp variable' + ENDC)
         self.temp_var_id += 1
-        registry_command.append('TLOAD ' + '#TEMP_' + str(self.temp_var_id))
+        registry_command.append('TEMPORARY_LOAD ' + '#TEMP_' + str(self.temp_var_id))
         return '#TEMP_' + str(self.temp_var_id)
 
 
@@ -188,8 +188,8 @@ class ExprCoder:
 
             if self.current()[0] in string:
                 reg = self.registry.find_free(self.current()[0], self.registry_command)
-                value = self.current()[1]
-                self.registry_command.append('LOAD ' + reg + ' ' + value)
+                value = ' '.join(self.current()[1:])
+                self.registry_command.append('LOAD ' + reg + ' \'' + value + '\'')
                 expr_stack.append(reg)
                 self.next()
                 continue
@@ -205,7 +205,7 @@ class ExprCoder:
             if self.current()[0] == 'VAR':
                 reg = self.registry.find_free(self.current()[1], self.registry_command)
                 value = self.current()[2]
-                self.registry_command.append('VLOAD ' + reg + ' ' + value)
+                self.registry_command.append('VARIABLE_LOAD ' + reg + ' ' + value)
                 expr_stack.append(reg)
                 self.next()
                 continue
@@ -213,16 +213,17 @@ class ExprCoder:
             if self.current()[0] == 'CALL':
                 # self.registry_command.append('CALL')
                 self.next()
+                self.registry_command.append('CALL')
                 reg_name = self.expr_executor()
-                self.next()
+                self.registry_command.append('ENDNAME')
                 self.next()
                 # self.registry_command.append('LOAD ' + reg_name + ' #out')
-                params = ''
+                params = []
                 while self.current()[0] != 'ENDPARAMS':
-                    params += ' ' + self.expr_executor()
+                    params += self.expr_executor()
                     self.next()
 
-                self.registry_command.append('CALL #out ' + reg_name + params)
+                self.registry_command.append('ENDPARAMS')
                 expr_stack.append('#out')
                 self.next()
 
@@ -231,19 +232,21 @@ class ExprCoder:
                 else:
                     self.registry.free(reg_name)
 
-                for param in params.strip().split(' '):
-                    if param[:2] == '#T':
-                        self.registry_command.append('REMOVE ' + param)
-                    else:
-                        self.registry.free(param)
+                    # for param in params:
+                    #     if param[:2] == '#T':
+                    #         self.registry_command.append('REMOVE ' + param)
+                    #     else:
+                    #         self.registry.free(param)
                 continue
 
             if self.current()[0] == 'ENDEXPR':
-                self.registry_command.append('ENDEXPR ' + '#out ' + expr_stack.pop())
+                out = expr_stack.pop() if len(expr_stack) else '#out'
+                self.registry_command.append('ENDEXPR ' + '#out ' + str(out))
+
                 return self.registry_command
 
-            if self.current()[0] in ['ENDNAME', 'ENDPARAM']:
+            if self.current()[0] in ['ENDNAME', 'ENDPARAMS']:
                 return expr_stack.pop()
 
-            print('Unexpected expr command %s' % self.current())
+            print('Expr decoder:Unexpected expr command %s' % self.current())
             exit(5)
